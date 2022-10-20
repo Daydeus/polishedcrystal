@@ -19,7 +19,7 @@ BulbasaurEvosAttacks:
 	db 13, POISONPOWDER
 	db 13, SLEEP_POWDER
 	db 15, MUD_SLAP ; Take Down → GSC TM move
-	db 19, RAZOR_LEAF
+	db 19, MEGA_DRAIN ; Razor Leaf → Mega Drain (Daydeus)
 	db 21, TAKE_DOWN ; Sweet Scent → Take Down
 	db 25, GROWTH
 	db 27, DOUBLE_EDGE
@@ -39,7 +39,7 @@ IvysaurEvosAttacks:
 	db 13, POISONPOWDER
 	db 13, SLEEP_POWDER
 	db 15, MUD_SLAP ; Take Down → GSC TM move
-	db 20, RAZOR_LEAF
+	db 20, MEGA_DRAIN ; Razor Leaf → Mega Drain (Daydeus)
 	db 23, TAKE_DOWN ; Sweet Scent → Take Down
 	db 28, GROWTH
 	db 31, DOUBLE_EDGE
@@ -60,7 +60,7 @@ VenusaurEvosAttacks:
 	db 13, POISONPOWDER
 	db 13, SLEEP_POWDER
 	db 15, MUD_SLAP ; Take Down → GSC TM move
-	db 20, RAZOR_LEAF
+	db 20, MEGA_DRAIN ; Razor Leaf → Mega Drain (Daydeus)
 	db 23, TAKE_DOWN ; Sweet Scent → Take Down
 	db 28, GROWTH
 	db 31, DOUBLE_EDGE
@@ -196,71 +196,89 @@ endc
 	db 0 ; no more level-up moves
 
 CaterpieEvosAttacks:
-	db EVOLVE_LEVEL, 7, METAPOD
+	db EVOLVE_LEVEL, 10, METAPOD
 	db 0 ; no more evolutions
 	db 1, TACKLE
 	db 1, STRING_SHOT
-	db 9, BUG_BITE
+	db 5, ABSORB
+	db 9, MINIMIZE
+	db 13, DISARM_VOICE
+	db 17, BUG_BITE
+	db 21, HEADBUTT
 	db 0 ; no more level-up moves
 
 MetapodEvosAttacks:
-	db EVOLVE_LEVEL, 10, BUTTERFREE
+	db EVOLVE_LEVEL, 20, BUTTERFREE
 	db 0 ; no more evolutions
 	db 1, TACKLE ; Caterpie move
 	db 1, STRING_SHOT ; Caterpie move
 	db 1, DEFENSE_CURL ; Harden → similar move
+	db 5, ABSORB ; Caterpie move
+	db 9, MINIMIZE ; Caterpie move
+	db 14, ENDURE
+	db 18, CALM_MIND
+	db 22, TAKE_DOWN
+	db 26, HEALINGLIGHT
+	db 30, DOUBLE_EDGE
 	db 0 ; no more level-up moves
 
 ButterfreeEvosAttacks:
 	db 0 ; no more evolutions
 	db 1, TACKLE ; Caterpie move
 	db 1, STRING_SHOT ; Caterpie move
+	db 1, POISONPOWDER
+	db 1, STUN_SPORE
 	db 1, GUST
-	db 11, CONFUSION
-	db 13, POISONPOWDER
-	db 15, STUN_SPORE
-	db 17, SLEEP_POWDER ; Psybeam → Sleep Powder
-	db 19, PSYBEAM ; Silver Wind → Psybeam
-	db 23, SUPERSONIC
+	db 1, CONFUSION ; evolution move
+	db 23, SLEEP_POWDER ; Supersonic → Sleep Powder (Daydeus)
 	db 25, SAFEGUARD
-	db 29, HYPNOSIS ; Whirlwind → new move
-	db 31, BUG_BUZZ
-	db 35, REFLECT ; Rage Powder → RBY TM move
+	db 29, REFLECT ; Hypnosis → Reflect (Daydeus)
+	db 31, PSYBEAM ; Bug Buzz → Psybeam (Daydeus)
+	db 35, AIR_SLASH ; Reflect → Air Slash (Daydeus)
 	db 37, AGILITY ; Captivate → new move
 	db 41, HEALINGLIGHT ; Tailwind → new move
-	db 43, AIR_SLASH
-	db 47, PSYCHIC_M ; Quiver Dance → TM move
+	db 43, BUG_BUZZ ; Air Slash → Bug Buzz (Daydeus)
+	db 47, EXTRASENSORY ; Psychic move → Extrasensory (Daydeus)
 	db 0 ; no more level-up moves
 
 WeedleEvosAttacks:
-	db EVOLVE_LEVEL, 7, KAKUNA
+	db EVOLVE_LEVEL, 10, KAKUNA
 	db 0 ; no more evolutions
 	db 1, POISON_STING
 	db 1, STRING_SHOT
-	db 9, BUG_BITE
+	db 5, PECK
+	db 9, MINIMIZE
+	db 13, BITE
+	db 17, BUG_BITE
+	db 21, HORN_ATTACK
 	db 0 ; no more level-up moves
 
 KakunaEvosAttacks:
-	db EVOLVE_LEVEL, 10, BEEDRILL
+	db EVOLVE_LEVEL, 20, BEEDRILL
 	db 0 ; no more evolutions
 	db 1, POISON_STING ; Weedle move
 	db 1, STRING_SHOT ; Weedle move
 	db 1, DEFENSE_CURL ; Harden → similar move
+	db 5, PECK ; Weedle move
+	db 9, MINIMIZE ; Weedle move
+	db 14, ENDURE
+	db 18, CALM_MIND
+	db 22, TAKE_DOWN
+	db 26, REVERSAL
+	db 30, DOUBLE_EDGE
 	db 0 ; no more level-up moves
 
 BeedrillEvosAttacks:
 	db 0 ; no more evolutions
 	db 1, POISON_STING ; Weedle move
 	db 1, STRING_SHOT ; Weedle move
-	db 1, FURY_STRIKES ; Fury Attack → similar move
-	db 1, U_TURN ; evolution move
-	db 14, RAGE
-	db 17, PURSUIT
-	db 20, FOCUS_ENERGY
-	db 23, VENOSHOCK
+	db 1, RAGE ; Fury Attack → Rage
+	db 1, PURSUIT
+	db 1, PIN_MISSILE ; evolution move
+	db 23, FURY_STRIKES ; Venoshock → Fury Strikes (Daydeus)
 	db 26, FEINT_ATTACK ; Assurance → similar move
 	db 29, TOXIC_SPIKES
-	db 32, PIN_MISSILE
+	db 32, DRILL_PECK ; Pin Missile → Drill Peck (Daydeus)
 	db 35, POISON_JAB
 	db 38, AGILITY
 	db 41, SWORDS_DANCE ; Endeavor → TM move
@@ -1428,15 +1446,15 @@ BellsproutEvosAttacks:
 	db 1, VINE_WHIP
 	db 7, GROWTH
 	db 11, WRAP
-	db 13, SLEEP_POWDER
+	db 13, ACID ; Sleep Powder → Acid (Daydeus)
 	db 15, POISONPOWDER
 	db 17, STUN_SPORE
-	db 23, ACID
+	db 23, RAZOR_LEAF ; Acid → Razor Leaf (Daydeus)
 	db 27, KNOCK_OFF
 	db 29, SWEET_KISS ; Sweet Scent → event move
 	db 35, HEALINGLIGHT ; Gastro Acid → new move
-	db 39, RAZOR_LEAF
-	db 41, POISON_JAB
+	db 39, POISON_JAB ; Razor Leaf → Poison Jab (Daydeus)
+	db 41, POWER_WHIP ; Poison Jab → Power Whip (Daydeus)
 	db 47, SUCKER_PUNCH ; Slam → HGSS tutor move
 	db 50, SWORDS_DANCE ; Wring Out → egg move
 	db 0 ; no more level-up moves
@@ -1447,15 +1465,15 @@ WeepinbellEvosAttacks:
 	db 1, VINE_WHIP
 	db 7, GROWTH
 	db 11, WRAP
-	db 13, SLEEP_POWDER
+	db 13, ACID ; Sleep Powder → Acid (Daydeus)
 	db 15, POISONPOWDER
 	db 17, STUN_SPORE
-	db 24, ACID
+	db 24, RAZOR_LEAF ; Acid → Razor Leaf (Daydeus)
 	db 29, KNOCK_OFF
 	db 32, SWEET_KISS ; Sweet Scent → event move
 	db 39, HEALINGLIGHT ; Gastro Acid → new move
-	db 44, RAZOR_LEAF
-	db 47, POISON_JAB
+	db 44, POISON_JAB ; Razor Leaf → Poison Jab (Daydeus)
+	db 47, POWER_WHIP ; Poison Jab → Power Whip (Daydeus)
 	db 54, SUCKER_PUNCH ; Slam → HGSS tutor move
 	db 58, SWORDS_DANCE ; Wring Out → egg move
 	db 0 ; no more level-up moves
@@ -3383,12 +3401,12 @@ ChikoritaEvosAttacks:
 	db 0 ; no more evolutions
 	db 1, TACKLE
 	db 1, GROWL
-	db 6, RAZOR_LEAF
+	db 6, VINE_WHIP ; Razor Leaf → Vine Whip (Daydeus)
 	db 9, POISONPOWDER
 	db 12, HEALINGLIGHT ; Synthesis → similar move
 	db 17, REFLECT
 	db 20, DISARM_VOICE ; Magical Leaf → new move
-	db 23, ENERGY_BALL ; Natural Gift → tutor move
+	db 23, RAZOR_LEAF ; Energy Ball → Razor Leaf (Daydeus)
 	db 28, ANCIENTPOWER ; Sweet Scent → HGSS tutor move
 	db 31, LIGHT_SCREEN
 	db 34, BODY_SLAM
@@ -3405,12 +3423,12 @@ BayleefEvosAttacks:
 	db 0 ; no more evolutions
 	db 1, TACKLE
 	db 1, GROWL
-	db 6, RAZOR_LEAF
+	db 6, VINE_WHIP ; Razor Leaf → Vine Whip (Daydeus)
 	db 9, POISONPOWDER
 	db 12, HEALINGLIGHT ; Synthesis → similar move
 	db 18, REFLECT
 	db 22, DISARM_VOICE ; Magical Leaf → new move
-	db 26, ENERGY_BALL ; Natural Gift → tutor move
+	db 26, RAZOR_LEAF ; Energy Ball → Razor Leaf (Daydeus)
 	db 32, ANCIENTPOWER ; Sweet Scent → HGSS tutor move
 	db 36, LIGHT_SCREEN
 	db 40, BODY_SLAM
@@ -3427,12 +3445,12 @@ MeganiumEvosAttacks:
 	db 1, PETAL_DANCE ; evolution move
 	db 1, TACKLE
 	db 1, GROWL
-	db 6, RAZOR_LEAF
+	db 6, VINE_WHIP ; Razor Leaf → Vine Whip (Daydeus)
 	db 9, POISONPOWDER
 	db 12, HEALINGLIGHT ; Synthesis → similar move
 	db 18, REFLECT
 	db 22, DISARM_VOICE ; Magical Leaf → new move
-	db 26, ENERGY_BALL ; Natural Gift → tutor move
+	db 26, RAZOR_LEAF ; Energy Ball → Razor Leaf (Daydeus)
 	db 34, ANCIENTPOWER ; Sweet Scent → HGSS tutor move
 	db 40, LIGHT_SCREEN
 	db 46, BODY_SLAM
@@ -4070,7 +4088,7 @@ SunkernEvosAttacks:
 	db 7, DEFENSE_CURL ; Grass Whistle → TM move
 	db 10, MEGA_DRAIN
 	db 13, LEECH_SEED
-	db 16, RAZOR_LEAF
+	db 16, SUNNY_DAY ; Razor Leaf → Sunny Day (Daydeus)
 	db 19, PROTECT ; Worry Seed → TM move
 	db 22, GIGA_DRAIN
 	db 25, AGILITY ; Endeavor → new move
@@ -4078,7 +4096,7 @@ SunkernEvosAttacks:
 	db 31, EARTH_POWER ; Natural Gift → tutor move
 	db 34, SOLAR_BEAM
 	db 37, DOUBLE_EDGE
-	db 40, SUNNY_DAY
+	db 40, DAZZLINGLEAM ; Sunny Day → Dazzling Gleam (Daydeus)
 	db 43, SEED_BOMB
 	db 0 ; no more level-up moves
 
@@ -4094,7 +4112,7 @@ endc
 	db 7, DEFENSE_CURL ; Grass Whistle → TM move
 	db 10, MEGA_DRAIN
 	db 13, LEECH_SEED
-	db 16, RAZOR_LEAF
+	db 16, SUNNY_DAY ; Razor Leaf → Sunny Day (Daydeus)
 	db 19, PROTECT ; Worry Seed → TM move
 	db 22, GIGA_DRAIN
 	db 25, AGILITY ; Bullet Seed → TM move
@@ -4106,7 +4124,7 @@ else
 endc
 	db 34, SOLAR_BEAM
 	db 37, DOUBLE_EDGE
-	db 40, SUNNY_DAY
+	db 40, DAZZLINGLEAM ; Sunny Day → Dazzling Gleam (Daydeus)
 	db 43, SEED_BOMB ; Leaf Storm → Sunkern move
 if !DEF(FAITHFUL)
 	db 50, FIRE_BLAST ; Petal Blizzard → TM move
@@ -5424,8 +5442,8 @@ LeafeonEvosAttacks:
 	db 9, DOUBLE_KICK ; Baby-Doll Eyes → Let's Go move
 	db 13, QUICK_ATTACK
 	db 17, BITE ; Grass Whistle → new move
-	db 20, ENERGY_BALL ; Magical Leaf → TM move
-	db 25, GIGA_DRAIN
+	db 20, GIGA_DRAIN ; Energy Ball → Giga Drain
+	db 25, ENERGY_BALL  ; Giga Drain → Energy Ball
 	db 29, SWORDS_DANCE
 	db 33, HEALINGLIGHT ; Synthesis → similar move
 	db 37, SEED_BOMB ; Sunny Day → tutor move

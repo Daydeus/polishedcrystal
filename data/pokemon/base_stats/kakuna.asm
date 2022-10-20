@@ -1,4 +1,4 @@
-	db  45,  25,  50,  35,  25,  25 ; 205 BST
+	db  55,  75,  50,  35,  45,  60 ; 320 BST
 	;   hp  atk  def  spd  sat  sdf
 
 	db BUG, POISON ; type
@@ -8,7 +8,7 @@
 	db NO_ITEM ; item 2
 	dn GENDER_F50, 2 ; gender ratio, step cycles to hatch
 	INCBIN "gfx/pokemon/kakuna/front.dimensions"
-	abilities_for KAKUNA, SHED_SKIN, SHED_SKIN, SHED_SKIN
+	abilities_for KAKUNA, SHELL_ARMOR, SHED_SKIN, SHED_SKIN
 	db GROWTH_MEDIUM_FAST ; growth rate
 	dn EGG_BUG, EGG_BUG ; egg groups
 

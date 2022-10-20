@@ -17,7 +17,7 @@ endc
 	db POISON_BARB ; item 2
 	dn GENDER_F50, 2 ; gender ratio, step cycles to hatch
 	INCBIN "gfx/pokemon/beedrill/front.dimensions"
-	abilities_for BEEDRILL, SWARM, SNIPER, ADAPTABILITY
+	abilities_for BEEDRILL, SWARM, POISON_POINT, ADAPTABILITY
 	db GROWTH_MEDIUM_FAST ; growth rate
 	dn EGG_BUG, EGG_BUG ; egg groups
 

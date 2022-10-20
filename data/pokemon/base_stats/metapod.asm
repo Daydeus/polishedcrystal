@@ -1,4 +1,4 @@
-	db  50,  20,  55,  30,  25,  25 ; 205 BST
+	db  55,  40,  55,  40,  65,  65 ; 320 BST
 	;   hp  atk  def  spd  sat  sdf
 
 	db BUG, BUG ; type
@@ -8,7 +8,7 @@
 	db NO_ITEM ; item 2
 	dn GENDER_F50, 2 ; gender ratio, step cycles to hatch
 	INCBIN "gfx/pokemon/metapod/front.dimensions"
-	abilities_for METAPOD, SHED_SKIN, SHED_SKIN, SHED_SKIN
+	abilities_for METAPOD, SHELL_ARMOR, SHED_SKIN, ANTICIPATION
 	db GROWTH_MEDIUM_FAST ; growth rate
 	dn EGG_BUG, EGG_BUG ; egg groups
 
