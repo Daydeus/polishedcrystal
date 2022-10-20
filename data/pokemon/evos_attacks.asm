@@ -3593,19 +3593,19 @@ FeraligatrEvosAttacks:
 	db 0 ; no more level-up moves
 
 SentretEvosAttacks:
-	db EVOLVE_LEVEL, 15, FURRET
+	db EVOLVE_LEVEL, 20, FURRET
 	db 0 ; no more evolutions
-	db 1, TACKLE
+	db 1, MUD_SLAP ; Tackle → Mud-Slap (Daydeus)
 	db 1, FORESIGHT
-	db 4, DEFENSE_CURL
+	db 4, ROLLOUT ; Defense Curl → Rollout (Daydeus)
 	db 7, QUICK_ATTACK
 	db 13, FURY_STRIKES ; Fury Swipes → similar move
 	db 16, DIZZY_PUNCH ; Helping Hand → event move
-	db 19, SUPER_FANG ; Follow Me → HGSS tutor move
+	db 19, MAGNITUDE ; Super Fang → Magnitude (Daydeus)
 	db 25, HEADBUTT ; Slam → tutor move
-	db 28, REST
+	db 28, SUPER_FANG ; Rest → Super Fang (Daydeus)
 	db 31, SUCKER_PUNCH
-	db 36, AMNESIA
+	db 36, DIG ; Amnesia → Dig (Daydeus)
 	db 39, BATON_PASS
 	db 42, SLASH ; Me First → egg move
 	db 47, HYPER_VOICE
@@ -3613,18 +3613,18 @@ SentretEvosAttacks:
 
 FurretEvosAttacks:
 	db 0 ; no more evolutions
-	db 1, TACKLE
+	db 1, MUD_SLAP ; Tackle → Mud-Slap (Daydeus)
 	db 1, FORESIGHT
 	db 1, AGILITY ; evolution move
-	db 4, DEFENSE_CURL
+	db 4, ROLLOUT ; Defense Curl → Rollout (Daydeus)
 	db 7, QUICK_ATTACK
 	db 13, FURY_STRIKES ; Fury Swipes → similar move
 	db 17, DIZZY_PUNCH ; Helping Hand → event move
-	db 21, SUPER_FANG ; Follow Me → HGSS tutor move
+	db 21, MAGNITUDE ; Super Fang → Magnitude (Daydeus)
 	db 28, HEADBUTT ; Slam → tutor move
-	db 32, REST
+	db 32, SUPER_FANG ; Rest → Super Fang (Daydeus)
 	db 36, SUCKER_PUNCH
-	db 42, AMNESIA
+	db 42, DIG ; Amnesia → Dig (Daydeus)
 	db 46, BATON_PASS
 	db 50, SLASH ; Me First → egg move
 	db 56, HYPER_VOICE
