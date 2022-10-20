@@ -271,13 +271,13 @@ AeroblastDescription:
 CrossChopDescription:
 NightSlashDescription:
 ShadowClawDescription:
+DazzlingleamDescription:
 StoneEdgeDescription:
-	db   "Has a high criti-"
-	next "cal hit ratio.@"
+	db   "A high critical"
+	next "hit ratio move.@"
 
 SwiftDescription:
 FeintAttackDescription:
-DisarmVoiceDescription:
 AerialAceDescription:
 AuraSphereDescription:
 	db   "An attack that"
@@ -416,7 +416,6 @@ if !DEF(FAITHFUL)
 	next "and Light Screen.@"
 endc
 CrunchDescription:
-IronTailDescription:
 	db   "An attack that may"
 	next "lower Defense.@"
 
@@ -448,9 +447,6 @@ FocusBlastDescription:
 	next "lower Spcl.Def.@"
 
 MudSlapDescription:
-	db   "An attack that"
-	next "lowers accuracy.@"
-
 OctazookaDescription:
 	db   "An attack that may"
 	next "lower accuracy.@"
@@ -722,6 +718,7 @@ ToxicSpikesDescription:
 	db   "Poisons foes when"
 	next "they switch in.@"
 
+DisarmVoiceDescription:
 QuickAttackDescription:
 	db   "Lets the user get"
 	next "in the first hit.@"
@@ -798,10 +795,6 @@ SuckerPunchDescription:
 	db   "Attacks before the"
 	next "foe does.@"
 
-DazzlingleamDescription:
-	db   "Dazzles with a"
-	next "powerful flash.@"
-
 RoarDescription:
 	db   "Scares wild foes"
 	next "to end battle.@"
@@ -853,6 +846,10 @@ TeleportDescription:
 DragonPulseDescription:
 	db   "Attacks foe with"
 	next "a shock wave.@"
+
+IronTailDescription:
+	db   "Swings tail hard"
+	next "as solid metal.@"
 
 AquaTailDescription:
 	db   "Swings tail like a"

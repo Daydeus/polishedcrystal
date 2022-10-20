@@ -7,5 +7,6 @@ CriticalHitMoves:
 	db AEROBLAST
 	db CROSS_CHOP
 	db SHADOW_CLAW
+	db DAZZLINGLEAM
 	db STONE_EDGE
 	db -1
