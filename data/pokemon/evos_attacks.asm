@@ -345,11 +345,11 @@ RattataPlainEvosAttacks:
 RattataAlolanEvosAttacks:
 	db EVOLVE_LEVEL, 20, RATICATE
 	db 0 ; no more evolutions
-	db 1, TACKLE
+	db 1, BITE ; Tackle → Bite (Daydeus)
 	db 1, LEER ; Tail Whip → similar move
 	db 4, QUICK_ATTACK
 	db 7, FOCUS_ENERGY
-	db 10, BITE
+	db 10, SWIFT ; Bite → Swift (Daydeus)
 	db 13, PURSUIT
 	db 16, HYPER_FANG
 	db 19, SUCKER_PUNCH
