@@ -1534,18 +1534,18 @@ GeodudePlainEvosAttacks:
 	db EVOLVE_LEVEL, 25, GRAVELER
 	db 0 ; no more evolutions
 	db 1, TACKLE
-	db 1, DEFENSE_CURL
-	db 4, MUD_SLAP ; Mud Sport → TM move
-	db 6, RAPID_SPIN ; Rock Polish → event move
-	db 10, ROLLOUT
-	db 12, MAGNITUDE
-	db 16, ROCK_THROW
-	db 18, ANCIENTPOWER ; Smack Down → HGSS tutor move
-	db 22, BULLDOZE
+	db 1, BULK_UP ; Defense Curl → Bulk Up (Daydeus)
+	db 4, RAPID_SPIN ; Mud Slap → Rapid Spin (Daydeus)
+	db 6, FURY_STRIKES ; Rapid Spin → Fury Strikes (Daydeus)
+	db 10, ROCK_THROW ; Rollout → Rock Throw
+	db 12, FOCUS_ENERGY ; Magnitude → Focus Energy (Daydeus)
+	db 16, KARATE_CHOP ; Rock Throw → Karate Chop (Daydeus)
+	db 18, BULLDOZE ; Ancient Power → Bulldoze (Daydeus)
+	db 22, REVERSAL ;Bulldoze → Reversal (Daydeus)
 	db 24, ROCK_BLAST ; Self-Destruct → Rock Blast
 	db 28, SANDSTORM ; Stealth Rock → TM move
 	db 30, ROCK_SLIDE ; Rock Blast → TM move
-	db 34, EARTHQUAKE
+	db 34, CLOSE_COMBAT ; Earthquake → Close Combat (Daydeus)
 	db 36, EXPLOSION
 	db 40, DOUBLE_EDGE
 	db 42, STONE_EDGE
@@ -1555,18 +1555,18 @@ GravelerPlainEvosAttacks:
 	db EVOLVE_EVS, MON_DEF_EV, GOLEM
 	db 0 ; no more evolutions
 	db 1, TACKLE
-	db 1, DEFENSE_CURL
-	db 4, MUD_SLAP ; Mud Sport → TM move
-	db 6, RAPID_SPIN ; Rock Polish → event move
-	db 10, ROLLOUT
-	db 12, MAGNITUDE
-	db 16, ROCK_THROW
-	db 18, ANCIENTPOWER ; Smack Down → HGSS tutor move
-	db 22, BULLDOZE
+	db 1, BULK_UP ; Defense Curl → Bulk Up (Daydeus)
+	db 4, RAPID_SPIN ; Mud Slap → Rapid Spin (Daydeus)
+	db 6, FURY_STRIKES ; Rapid Spin → Fury Strikes (Daydeus)
+	db 10, ROCK_THROW ; Rollout → Rock Throw
+	db 12, FOCUS_ENERGY ; Magnitude → Focus Energy (Daydeus)
+	db 16, KARATE_CHOP ; Rock Throw → Karate Chop (Daydeus)
+	db 18, BULLDOZE ; Ancient Power → Bulldoze (Daydeus)
+	db 22, REVERSAL ;Bulldoze → Reversal (Daydeus)
 	db 24, ROCK_BLAST ; Self-Destruct → Rock Blast
 	db 30, SANDSTORM ; Stealth Rock → TM move
 	db 34, ROCK_SLIDE ; Rock Blast → TM move
-	db 40, EARTHQUAKE
+	db 40, CLOSE_COMBAT ; Earthquake → Close Combat (Daydeus)
 	db 44, EXPLOSION
 	db 50, DOUBLE_EDGE
 	db 54, STONE_EDGE
@@ -1575,18 +1575,18 @@ GravelerPlainEvosAttacks:
 GolemPlainEvosAttacks:
 	db 0 ; no more evolutions
 	db 1, TACKLE
-	db 1, DEFENSE_CURL
-	db 4, MUD_SLAP ; Mud Sport → TM move
-	db 6, RAPID_SPIN ; Rock Polish → event move
-	db 10, ROLLOUT
-	db 12, MAGNITUDE
-	db 16, ROCK_THROW
-	db 18, ANCIENTPOWER ; Smack Down → HGSS tutor move
-	db 22, BULLDOZE
+	db 1, BULK_UP ; Defense Curl → Bulk Up (Daydeus)
+	db 4, RAPID_SPIN ; Mud Slap → Rapid Spin (Daydeus)
+	db 6, FURY_STRIKES ; Rapid Spin → Fury Strikes (Daydeus)
+	db 10, ROCK_THROW ; Rollout → Rock Throw
+	db 12, FOCUS_ENERGY ; Magnitude → Focus Energy (Daydeus)
+	db 16, KARATE_CHOP ; Rock Throw → Karate Chop (Daydeus)
+	db 18, BULLDOZE ; Ancient Power → Bulldoze (Daydeus)
+	db 22, REVERSAL ;Bulldoze → Reversal (Daydeus)
 	db 24, ROCK_BLAST ; Self-Destruct → Rock Blast
 	db 30, SANDSTORM ; Stealth Rock → TM move
 	db 34, ROCK_SLIDE ; Rock Blast → TM move
-	db 40, EARTHQUAKE
+	db 40, CLOSE_COMBAT ; Earthquake → Close Combat (Daydeus)
 	db 44, EXPLOSION
 	db 50, DOUBLE_EDGE
 	db 54, STONE_EDGE
