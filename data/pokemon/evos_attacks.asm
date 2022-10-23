@@ -2101,12 +2101,12 @@ GastlyEvosAttacks:
 	db 5, DISABLE ; Spite → egg move
 	db 8, MEAN_LOOK
 	db 12, CURSE
-	db 15, NIGHT_SHADE
+	db 15, ACID ; Night Shade → Acid
 	db 19, CONFUSE_RAY
 	db 22, SUCKER_PUNCH
 	db 26, PAIN_SPLIT ; Payback → HGSS tutor move
 	db 29, SHADOW_BALL
-	db 33, DREAM_EATER
+	db 33, SLUDGE_BOMB ; Dream Eater → Sludge Bomb
 	db 36, DARK_PULSE
 	db 40, DESTINY_BOND
 	db 43, HEX
@@ -2122,12 +2122,12 @@ HaunterEvosAttacks:
 	db 5, DISABLE ; Spite → egg move
 	db 8, MEAN_LOOK
 	db 12, CURSE
-	db 15, NIGHT_SHADE
+	db 15, ACID ; Night Shade → Acid
 	db 19, CONFUSE_RAY
 	db 22, SUCKER_PUNCH
 	db 28, PAIN_SPLIT ; Payback → HGSS tutor move
 	db 33, SHADOW_BALL
-	db 39, DREAM_EATER
+	db 39, SLUDGE_BOMB ; Dream Eater → Sludge Bomb
 	db 44, DARK_PULSE
 	db 50, DESTINY_BOND
 	db 55, HEX
@@ -2142,12 +2142,12 @@ GengarEvosAttacks:
 	db 5, DISABLE ; Spite → egg move
 	db 8, MEAN_LOOK
 	db 12, CURSE
-	db 15, NIGHT_SHADE
+	db 15, ACID ; Night Shade → Acid
 	db 19, CONFUSE_RAY
 	db 22, SUCKER_PUNCH
 	db 28, PAIN_SPLIT ; Payback → HGSS tutor move
 	db 33, SHADOW_BALL
-	db 39, DREAM_EATER
+	db 39, SLUDGE_BOMB ; Dream Eater → Sludge Bomb
 	db 44, DARK_PULSE
 	db 50, DESTINY_BOND
 	db 55, HEX
