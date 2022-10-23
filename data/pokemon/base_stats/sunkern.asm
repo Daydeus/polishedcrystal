@@ -1,7 +1,7 @@
 	db  30,  30,  30,  30,  30,  30 ; 180 BST
 	;   hp  atk  def  spd  sat  sdf
 
-	db GRASS, GRASS ; type
+	db GRASS, FIRE ; type
 	db 235 ; catch rate
 	db 52 ; base exp
 	db NO_ITEM ; item 1

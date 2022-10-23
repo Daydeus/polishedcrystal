@@ -4085,13 +4085,13 @@ SunkernEvosAttacks:
 	db 1, SPLASH ; Growth → Hoppip move
 	db 1, ABSORB
 	db 4, GROWTH ; Ingrain → Growth
-	db 7, DEFENSE_CURL ; Grass Whistle → TM move
+	db 7, EMBER ; Defense Curl → Ember
 	db 10, MEGA_DRAIN
 	db 13, LEECH_SEED
 	db 16, SUNNY_DAY ; Razor Leaf → Sunny Day
 	db 19, PROTECT ; Worry Seed → TM move
 	db 22, GIGA_DRAIN
-	db 25, AGILITY ; Endeavor → new move
+	db 25, FIRE_SPIN ; Agility → Fire Spin
 	db 28, HEALINGLIGHT ; Synthesis → similar move
 	db 31, EARTH_POWER ; Natural Gift → tutor move
 	db 34, SOLAR_BEAM
@@ -4106,7 +4106,7 @@ SunfloraEvosAttacks:
 	db 1, TACKLE ; Pound → similar move
 	db 1, ABSORB
 if !DEF(FAITHFUL)
-	db 1, EMBER ; evolution move
+	db 1, FLAME_CHARGE ; evolution move
 endc
 	db 4, GROWTH ; Ingrain → Growth
 	db 7, DEFENSE_CURL ; Grass Whistle → TM move
@@ -4115,7 +4115,7 @@ endc
 	db 16, SUNNY_DAY ; Razor Leaf → Sunny Day
 	db 19, PROTECT ; Worry Seed → TM move
 	db 22, GIGA_DRAIN
-	db 25, AGILITY ; Bullet Seed → TM move
+	db 25, FIRE_SPIN ; Agility → Fire Spin
 	db 28, PETAL_DANCE
 if DEF(FAITHFUL)
 	db 31, EARTH_POWER ; Natural Gift → tutor move
