@@ -6,7 +6,11 @@ else
 	;   hp  atk  def  spd  sat  sdf
 endc
 
+if DEF(FAITHFUL)
 	db BUG, FLYING ; type
+else
+	db BUG, FIGHTING ; type
+endc
 	db 255 ; catch rate
 	db 54 ; base exp
 	db NO_ITEM ; item 1

@@ -3683,12 +3683,12 @@ LedybaEvosAttacks:
 	db 0 ; no more evolutions
 	db 1, TACKLE
 	db 5, SUPERSONIC
-	db 8, SWIFT
+	db 8, FURY_STRIKES
 	db 12, LIGHT_SCREEN
 	db 12, REFLECT
 	db 12, SAFEGUARD
 	db 15, MACH_PUNCH
-	db 19, BARRIER ; Silver Wind → event move
+	db 19, BUG_BITE
 	db 22, DIZZY_PUNCH ; Comet Punch → new move
 	db 26, BATON_PASS
 	db 29, AGILITY
@@ -3702,12 +3702,12 @@ LedianEvosAttacks:
 	db 1, SWORDS_DANCE ; evolution move
 	db 1, TACKLE
 	db 5, SUPERSONIC
-	db 8, SWIFT
+	db 8, FURY_STRIKES
 	db 12, LIGHT_SCREEN
 	db 12, REFLECT
 	db 12, SAFEGUARD
 	db 15, MACH_PUNCH
-	db 20, BARRIER ; Silver Wind → event move
+	db 20, BUG_BITE
 	db 24, DIZZY_PUNCH ; Comet Punch → new move
 	db 29, BATON_PASS
 	db 33, AGILITY
