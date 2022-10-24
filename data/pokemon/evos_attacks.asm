@@ -3723,10 +3723,10 @@ SpinarakEvosAttacks:
 	db 1, STRING_SHOT
 	db 1, WRAP ; Constrict → similar move
 	db 5, ABSORB
-	db 8, GLARE ; Infestation → new move
-	db 12, ASTONISH
-	db 15, FEINT_ATTACK
-	db 19, GROWTH ; Shadow Sneak → event move
+	db 8, BITE
+	db 12, GLARE
+	db 15, ASTONISH
+	db 19, FEINT_ATTACK
 	db 22, FURY_STRIKES ; Fury Swipes → similar move
 	db 26, SUCKER_PUNCH
 	db 29, MEAN_LOOK ; Spider Web → similar move
@@ -3735,6 +3735,7 @@ SpinarakEvosAttacks:
 	db 40, PSYCHIC_M
 	db 43, POISON_JAB
 	db 47, LEECH_LIFE ; Cross Poison → TM move
+	db 50, CRUNCH
 	db 0 ; no more level-up moves
 
 AriadosEvosAttacks:
@@ -3745,10 +3746,10 @@ AriadosEvosAttacks:
 	db 1, STRING_SHOT
 	db 1, WRAP ; Constrict → similar move
 	db 5, ABSORB
-	db 8, GLARE ; Infestation → new move
-	db 12, ASTONISH
-	db 15, FEINT_ATTACK
-	db 19, GROWTH ; Shadow Sneak → event move
+	db 8, BITE
+	db 12, GLARE
+	db 15, ASTONISH
+	db 19, FEINT_ATTACK
 	db 23, FURY_STRIKES ; Fury Swipes → similar move
 	db 28, SUCKER_PUNCH
 	db 32, MEAN_LOOK ; Spider Web → similar move
@@ -3757,6 +3758,7 @@ AriadosEvosAttacks:
 	db 46, PSYCHIC_M
 	db 50, POISON_JAB
 	db 55, LEECH_LIFE ; Cross Poison → TM move
+	db 59, CRUNCH
 	db 0 ; no more level-up moves
 
 CrobatEvosAttacks:

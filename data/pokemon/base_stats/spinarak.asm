@@ -1,7 +1,11 @@
 	db  40,  60,  40,  30,  40,  40 ; 250 BST
 	;   hp  atk  def  spd  sat  sdf
 
+if DEF(FAITHFUL)
 	db BUG, POISON ; type
+else
+	db BUG, DARK ; type
+endc
 	db 255 ; catch rate
 	db 54 ; base exp
 	db NO_ITEM ; item 1
