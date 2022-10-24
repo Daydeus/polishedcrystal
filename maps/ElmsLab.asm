@@ -610,7 +610,7 @@ AideScript_GivePotions:
 	opentext
 	writetext AideText_GiveYouPotions
 	promptbutton
-	verbosegiveitem POTION
+	verbosegiveitem RARE_CANDY, 5
 	setscene $2
 	jumpopenedtext AideText_AlwaysBusy
 
