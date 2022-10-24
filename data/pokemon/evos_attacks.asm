@@ -825,11 +825,12 @@ ZubatEvosAttacks:
 	db EVOLVE_LEVEL, 22, GOLBAT
 	db 0 ; no more evolutions
 	db 1, ABSORB
-	db 5, SUPERSONIC
-	db 7, ASTONISH
-	db 11, BITE
-	db 13, GUST ; Wing Attack → egg move
-	db 17, CONFUSE_RAY
+	db 1, SUPERSONIC
+	db 5, BITE
+	db 7, GUST
+	db 11, POISON_STING
+	db 13, MEGA_DRAIN
+	db 17, ASTONISH
 	db 19, WING_ATTACK ; Air Cutter → Wing Attack
 	db 23, SWIFT
 	db 25, SUPER_FANG ; Poison Fang → HGSS tutor move
@@ -847,11 +848,12 @@ GolbatEvosAttacks:
 	db 1, SCREECH
 	db 1, ABSORB
 	db 1, CRUNCH ; Let's Go move
-	db 5, SUPERSONIC
-	db 7, ASTONISH
-	db 11, BITE
-	db 13, GUST ; Wing Attack → egg move
-	db 17, CONFUSE_RAY
+	db 1, SUPERSONIC
+	db 5, BITE
+	db 7, GUST
+	db 11, POISON_STING
+	db 13, MEGA_DRAIN
+	db 17, ASTONISH
 	db 19, WING_ATTACK ; Air Cutter → Wing Attack
 	db 24, SWIFT
 	db 27, SUPER_FANG ; Poison Fang → HGSS tutor move
@@ -3765,11 +3767,12 @@ CrobatEvosAttacks:
 	db 1, SCREECH
 	db 1, ABSORB
 	db 1, CRUNCH ; Let's Go move
-	db 5, SUPERSONIC
-	db 7, ASTONISH
-	db 11, BITE
-	db 13, GUST ; Wing Attack → egg move
-	db 17, CONFUSE_RAY
+	db 1, SUPERSONIC
+	db 5, BITE
+	db 7, GUST
+	db 11, POISON_STING
+	db 13, MEGA_DRAIN
+	db 17, ASTONISH
 	db 19, WING_ATTACK ; Air Cutter → Wing Attack
 	db 24, SWIFT
 	db 27, SUPER_FANG ; Poison Fang → HGSS tutor move
