@@ -5,7 +5,7 @@
 	db 120 ; catch rate
 	db 72 ; base exp
 	db NO_ITEM ; item 1
-	db NO_ITEM ; item 2
+	db SILVERPOWDER ; item 2
 	dn GENDER_F50, 2 ; gender ratio, step cycles to hatch
 	INCBIN "gfx/pokemon/metapod/front.dimensions"
 	abilities_for METAPOD, SHELL_ARMOR, SHED_SKIN, ANTICIPATION
@@ -17,4 +17,5 @@
 
 	; tm/hm learnset
 	tmhm
+	tmhm CURSE, TOXIC, HIDDEN_POWER, SUNNY_DAY, PROTECT, RAIN_DANCE, GIGA_DRAIN, SAFEGUARD, RETURN, DOUBLE_TEAM, SWIFT, SUBSTITUTE, FACADE, REST, ATTRACT, ENERGY_BALL, DOUBLE_EDGE, ENDURE, SLEEP_TALK, SWAGGER
 	; end

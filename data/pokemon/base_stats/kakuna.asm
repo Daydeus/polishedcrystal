@@ -5,7 +5,7 @@
 	db 120 ; catch rate
 	db 71 ; base exp
 	db NO_ITEM ; item 1
-	db NO_ITEM ; item 2
+	db POISON_BARB ; item 2
 	dn GENDER_F50, 2 ; gender ratio, step cycles to hatch
 	INCBIN "gfx/pokemon/kakuna/front.dimensions"
 	abilities_for KAKUNA, SHELL_ARMOR, SHED_SKIN, SHED_SKIN
@@ -16,5 +16,5 @@
 	;         hp  atk  def  spd  sat  sdf
 
 	; tm/hm learnset
-	tmhm
+	tmhm CURSE, TOXIC, HIDDEN_POWER, SUNNY_DAY, PROTECT, GIGA_DRAIN, RETURN, DOUBLE_TEAM, SLUDGE_BOMB, SWIFT, AERIAL_ACE, SUBSTITUTE, FACADE, REST, ATTRACT, LEECH_LIFE, FALSE_SWIPE, X_SCISSOR, POISON_JAB, SWORDS_DANCE, CUT, DOUBLE_EDGE, ENDURE, KNOCK_OFF, SLEEP_TALK, SWAGGER
 	; end
