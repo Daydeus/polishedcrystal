@@ -3689,8 +3689,8 @@ CyndaquilEvosAttacks:
 	db -1 ; no more evolutions
 	db 1, TACKLE
 	db 1, LEER
-	db 6, SMOKESCREEN
-	db 10, EMBER
+	db 6, EMBER
+	db 10, SMOKESCREEN
 	db 13, QUICK_ATTACK
 	db 19, DEFENSE_CURL ; Flame Wheel → Defense Curl
 	db 22, FLAME_CHARGE ; Defense Curl → Flame Charge
@@ -3710,8 +3710,8 @@ QuilavaEvosAttacks:
 	db -1 ; no more evolutions
 	db 1, TACKLE
 	db 1, LEER
-	db 6, SMOKESCREEN
-	db 10, EMBER
+	db 6, EMBER
+	db 10, SMOKESCREEN
 	db 13, QUICK_ATTACK
 	db 20, DEFENSE_CURL ; Flame Wheel → Defense Curl
 	db 24, FLAME_CHARGE ; Defense Curl → Flame Charge
@@ -3731,8 +3731,8 @@ TyphlosionPlainEvosAttacks:
 	db 1, FIRE_PUNCH ; evolution move
 	db 1, TACKLE
 	db 1, LEER
-	db 6, SMOKESCREEN
-	db 10, EMBER
+	db 6, EMBER
+	db 10, SMOKESCREEN
 	db 13, QUICK_ATTACK
 	db 20, DEFENSE_CURL ; Flame Wheel → Defense Curl
 	db 24, FLAME_CHARGE ; Defense Curl → Flame Charge
