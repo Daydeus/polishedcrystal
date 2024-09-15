@@ -270,6 +270,7 @@ LowKickDescription:
 	done
 
 KarateChopDescription:
+CutDescription:
 RazorLeafDescription:
 CrabhammerDescription:
 SlashDescription:
@@ -284,7 +285,6 @@ StoneEdgeDescription:
 
 SwiftDescription:
 FeintAttackDescription:
-DisarmVoiceDescription:
 AerialAceDescription:
 AuraSphereDescription:
 	text "An attack that"
@@ -346,6 +346,7 @@ BraveBirdDescription:
 StompDescription:
 HeadbuttDescription:
 BiteDescription:
+DragonRageDescription:
 WaterfallDescription:
 RockSlideDescription:
 HyperFangDescription:
@@ -398,7 +399,6 @@ BlizzardDescription:
 	next "freeze the foe."
 	done
 
-PsybeamDescription:
 ConfusionDescription:
 DizzyPunchDescription:
 WaterPulseDescription:
@@ -476,6 +476,7 @@ MoonblastDescription:
 	done
 
 AcidDescription:
+PsybeamDescription:
 PsychicMDescription:
 ShadowBallDescription:
 BugBuzzDescription:
@@ -500,11 +501,6 @@ OctazookaDescription:
 SonicboomDescription:
 	text "Always inflicts"
 	next "20HP damage."
-	done
-
-DragonRageDescription:
-	text "Always inflicts"
-	next "40HP damage."
 	done
 
 SeismicTossDescription:
@@ -640,7 +636,6 @@ StringShotDescription:
 	done
 
 SmokescreenDescription:
-FlashDescription:
 	text "A move that lowers"
 	next "the foe's accuracy."
 	done
@@ -828,6 +823,8 @@ ToxicSpikesDescription:
 	done
 
 QuickAttackDescription:
+FlashDescription:
+DisarmVoiceDescription:
 	text "Lets the user get"
 	next "in the first hit."
 	done
@@ -875,11 +872,6 @@ VineWhipDescription:
 DragonClawDescription:
 	text "Slashes the foe"
 	next "with sharp claws."
-	done
-
-CutDescription:
-	text "Cuts using claws,"
-	next "scythes, etc."
 	done
 
 XScissorDescription:
@@ -1198,8 +1190,8 @@ PowerWhipDescription:
 	done
 
 DragonbreathDescription:
-	text "A strong breath"
-	next "attack."
+	text "A breath attack"
+	next "that drains HP."
 	done
 
 BatonPassDescription:
