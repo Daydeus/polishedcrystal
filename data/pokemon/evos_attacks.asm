@@ -292,17 +292,17 @@ PidgeyEvosAttacks:
 	db 1, TACKLE
 	db 5, GUST ; Sand Attack → Gust
 	db 9, MUD_SLAP ; Gust → GSC TM move
-	db 13, QUICK_ATTACK
-	db 17, RAGE ; Whirlwind → RBY TM move
+	db 13, ICE_SHARD ; Quick Attack → Priority move
+	db 17, SAFEGUARD ; Whirlwind → GSC TM move
 	db 21, CHARM ; Twister → egg move
 	db 25, SWIFT ; Feather Dance → TM move
-	db 29, AGILITY
-	db 33, WING_ATTACK
+	db 29, WING_ATTACK
+	db 33, AURORA_BEAM
 	db 37, ROOST
-	db 41, DRILL_PECK ; Tailwind → new move
+	db 41, ICICLE_CRASH ; Tailwind → new move
 	db 45, STEEL_WING ; Mirror Move → TM move
 	db 49, AIR_SLASH
-	db 53, HURRICANE
+	db 53, BLIZZARD ; Hurricane → Different STAB Storm move
 	db -1 ; no more level-up moves
 
 PidgeottoEvosAttacks:
@@ -311,17 +311,17 @@ PidgeottoEvosAttacks:
 	db 1, TACKLE
 	db 5, GUST ; Sand Attack → Gust
 	db 9, MUD_SLAP ; Gust → GSC TM move
-	db 13, QUICK_ATTACK
-	db 17, RAGE ; Whirlwind → RBY TM move
+	db 13, ICE_SHARD ; Quick Attack → Priority move
+	db 17, SAFEGUARD ; Whirlwind → GSC TM move
 	db 22, CHARM ; Twister → egg move
 	db 27, SWIFT ; Feather Dance → TM move
-	db 32, AGILITY
-	db 37, WING_ATTACK
+	db 32, WING_ATTACK
+	db 37, AURORA_BEAM
 	db 42, ROOST
-	db 47, DRILL_PECK ; Tailwind → new move
+	db 47, ICICLE_CRASH ; Tailwind → new move
 	db 52, STEEL_WING ; Mirror Move → TM move
 	db 57, AIR_SLASH
-	db 62, HURRICANE
+	db 62, BLIZZARD ; Hurricane → Different STAB Storm move
 	db -1 ; no more level-up moves
 
 PidgeotEvosAttacks:
@@ -329,17 +329,17 @@ PidgeotEvosAttacks:
 	db 1, TACKLE
 	db 5, MUD_SLAP ; Sand Attack → similar move
 	db 9, GUST
-	db 13, QUICK_ATTACK
-	db 17, RAGE ; Whirlwind → RBY TM move
+	db 13, ICE_SHARD ; Quick Attack → Priority move
+	db 17, SAFEGUARD ; Whirlwind → GSC TM move
 	db 22, CHARM ; Twister → egg move
 	db 27, SWIFT ; Feather Dance → TM move
-	db 32, AGILITY
-	db 38, WING_ATTACK
+	db 32, WING_ATTACK
+	db 38, AURORA_BEAM
 	db 44, ROOST
-	db 50, DRILL_PECK ; Tailwind → new move
+	db 50, ICICLE_CRASH ; Tailwind → new move
 	db 56, STEEL_WING ; Mirror Move → TM move
 	db 62, AIR_SLASH
-	db 68, HURRICANE
+	db 68, BLIZZARD ; Hurricane → Different STAB Storm move
 	db -1 ; no more level-up moves
 
 RattataPlainEvosAttacks:
