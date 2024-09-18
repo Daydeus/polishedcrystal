@@ -219,15 +219,32 @@ CaterpieEvosAttacks:
 	db -1 ; no more evolutions
 	db 1, TACKLE
 	db 1, STRING_SHOT
-	db 9, BUG_BITE
+	db 4, ABSORB
+	db 7, BUG_BITE
+	db 10, ENDURE
+	db 13, FORESIGHT
+	db 16, MEGA_DRAIN
+	db 19, MINIMIZE
+	db 22, SCREECH
+	db 25, TAKE_DOWN
+	db 28, LEECH_LIFE
 	db -1 ; no more level-up moves
 
 MetapodEvosAttacks:
-	evo_data EVOLVE_LEVEL, 10, BUTTERFREE
+	evo_data EVOLVE_LEVEL, 15, BUTTERFREE
 	db -1 ; no more evolutions
 	db 1, TACKLE ; Caterpie move
 	db 1, STRING_SHOT ; Caterpie move
 	db 1, DEFENSE_CURL ; Harden → similar move
+	db 4, ABSORB
+	db 7, BUG_BITE
+	db 12, ENDURE
+	db 16, PROTECT
+	db 21, MEGA_DRAIN
+	db 25, MINIMIZE
+	db 30, SCREECH
+	db 34, TAKE_DOWN
+	db 39, LEECH_LIFE
 	db -1 ; no more level-up moves
 
 ButterfreeEvosAttacks:
@@ -235,20 +252,20 @@ ButterfreeEvosAttacks:
 	db 1, TACKLE ; Caterpie move
 	db 1, STRING_SHOT ; Caterpie move
 	db 1, GUST
-	db 11, CONFUSION
-	db 13, POISONPOWDER
-	db 15, STUN_SPORE
-	db 17, SLEEP_POWDER ; Psybeam → Sleep Powder
-	db 19, PSYBEAM ; Silver Wind → Psybeam
-	db 23, SUPERSONIC
-	db 25, SAFEGUARD
-	db 29, HYPNOSIS ; Whirlwind → new move
-	db 31, BUG_BUZZ
-	db 35, REFLECT ; Rage Powder → RBY TM move
-	db 37, AGILITY ; Captivate → new move
-	db 41, HEALINGLIGHT ; Tailwind → new move
-	db 43, AIR_SLASH
-	db 47, PSYCHIC_M ; Quiver Dance → TM move
+	db 16, CONFUSION
+	db 18, POISONPOWDER
+	db 20, STUN_SPORE
+	db 22, SLEEP_POWDER ; Psybeam → Sleep Powder
+	db 24, PSYBEAM ; Silver Wind → Psybeam
+	db 28, SUPERSONIC
+	db 30, SAFEGUARD
+	db 34, HYPNOSIS ; Whirlwind → new move
+	db 36, BUG_BUZZ
+	db 40, REFLECT ; Rage Powder → RBY TM move
+	db 42, AGILITY ; Captivate → new move
+	db 46, HEALINGLIGHT ; Tailwind → new move
+	db 48, AIR_SLASH
+	db 52, PSYCHIC_M ; Quiver Dance → TM move
 	db -1 ; no more level-up moves
 
 WeedleEvosAttacks:

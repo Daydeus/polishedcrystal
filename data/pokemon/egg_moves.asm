@@ -32,6 +32,15 @@ SquirtleEggMoves:
 	db AQUA_JET
 	db $ff
 
+CaterpieEggMoves:
+	db AGILITY
+	db BATON_PASS
+	db DISABLE
+	db HEALINGLIGHT
+	db QUICK_ATTACK
+	db CONFUSE_RAY
+	db $ff
+
 PidgeyEggMoves:
 	db PECK
 	db FEINT_ATTACK
