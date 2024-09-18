@@ -41,6 +41,15 @@ CaterpieEggMoves:
 	db CONFUSE_RAY
 	db $ff
 
+WeedleEggMoves:
+	db AGILITY
+	db BATON_PASS
+	db DRILL_PECK
+	db FEINT_ATTACK
+	db QUICK_ATTACK
+	db REVERSAL
+	db $ff
+
 PidgeyEggMoves:
 	db PECK
 	db FEINT_ATTACK

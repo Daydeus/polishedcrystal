@@ -273,15 +273,32 @@ WeedleEvosAttacks:
 	db -1 ; no more evolutions
 	db 1, POISON_STING
 	db 1, STRING_SHOT
-	db 9, BUG_BITE
+	db 4, PECK
+	db 7, BUG_BITE
+	db 10, ENDURE
+	db 13, SCARY_FACE
+	db 16, PURSUIT
+	db 19, MINIMIZE
+	db 22, SCREECH
+	db 25, TAKE_DOWN
+	db 28, LEECH_LIFE
 	db -1 ; no more level-up moves
 
 KakunaEvosAttacks:
-	evo_data EVOLVE_LEVEL, 10, BEEDRILL
+	evo_data EVOLVE_LEVEL, 15, BEEDRILL
 	db -1 ; no more evolutions
 	db 1, POISON_STING ; Weedle move
 	db 1, STRING_SHOT ; Weedle move
 	db 1, DEFENSE_CURL ; Harden → similar move
+	db 4, PECK
+	db 7, BUG_BITE
+	db 12, ENDURE
+	db 16, PROTECT
+	db 21, PURSUIT
+	db 25, MINIMIZE
+	db 30, SCREECH
+	db 34, TAKE_DOWN
+	db 39, LEECH_LIFE
 	db -1 ; no more level-up moves
 
 BeedrillEvosAttacks:
@@ -290,17 +307,17 @@ BeedrillEvosAttacks:
 	db 1, STRING_SHOT ; Weedle move
 	db 1, FURY_STRIKES ; Fury Attack → similar move
 	db 1, U_TURN ; evolution move
-	db 14, RAGE
-	db 17, PURSUIT
-	db 20, FOCUS_ENERGY
-	db 23, VENOSHOCK
-	db 26, FEINT_ATTACK ; Assurance → similar move
-	db 29, TOXIC_SPIKES
-	db 32, PIN_MISSILE
-	db 35, POISON_JAB
-	db 38, AGILITY
-	db 41, SWORDS_DANCE ; Endeavor → TM move
-	db 44, OUTRAGE ; Fell Stinger → LGPE move
+	db 19, RAGE
+	db 22, PURSUIT
+	db 25, FOCUS_ENERGY
+	db 28, VENOSHOCK
+	db 31, FEINT_ATTACK ; Assurance → similar move
+	db 34, TOXIC_SPIKES
+	db 37, PIN_MISSILE
+	db 40, POISON_JAB
+	db 43, AGILITY
+	db 46, SWORDS_DANCE ; Endeavor → TM move
+	db 49, OUTRAGE ; Fell Stinger → LGPE move
 	db -1 ; no more level-up moves
 
 PidgeyEvosAttacks:
