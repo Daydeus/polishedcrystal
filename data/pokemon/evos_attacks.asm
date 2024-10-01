@@ -669,6 +669,7 @@ NidorinaEvosAttacks:
 NidoqueenEvosAttacks:
 	db -1 ; no more evolutions
 	db 1, CLOSE_COMBAT ; Superpower → similar move
+	db 1, STOMP ; evolution move
 	db 1, SCRATCH
 	db 1, LEER ; Tail Whip → similar move
 	db 1, DOUBLE_KICK
@@ -718,6 +719,7 @@ NidorinoEvosAttacks:
 NidokingEvosAttacks:
 	db -1 ; no more evolutions
 	db 1, MEGAHORN
+	db 1, STOMP ; evolution move
 	db 1, PECK
 	db 1, FOCUS_ENERGY
 	db 1, DOUBLE_KICK

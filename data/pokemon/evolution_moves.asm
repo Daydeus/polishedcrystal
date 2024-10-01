@@ -30,10 +30,10 @@ EvolutionMoves::
 	db SLASH        ; SANDSLASH
 	db NO_MOVE      ; NIDORAN_F
 	db NO_MOVE      ; NIDORINA
-	db NO_MOVE      ; NIDOQUEEN
+	db STOMP        ; NIDOQUEEN
 	db NO_MOVE      ; NIDORAN_M
 	db NO_MOVE      ; NIDORINO
-	db NO_MOVE      ; NIDOKING
+	db STOMP        ; NIDOKING
 	db NO_MOVE      ; CLEFAIRY
 	db NO_MOVE      ; CLEFABLE
 	db NO_MOVE      ; VULPIX

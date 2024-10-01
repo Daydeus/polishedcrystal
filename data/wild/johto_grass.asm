@@ -1380,16 +1380,16 @@
 	wildmon 4, CATERPIE
 	wildmon 4, PIDGEY
 	wildmon 3, WEEDLE
-	wildmon 4, HOPPIP
-	wildmon 4, HOPPIP
+	wildmon 4, NIDORAN_M
+	wildmon 4, NIDORAN_M
 	; day
 	wildmon 3, PIDGEY
 	wildmon 3, CATERPIE
 	wildmon 4, CATERPIE
 	wildmon 4, PIDGEY
 	wildmon 3, WEEDLE
-	wildmon 4, HOPPIP
-	wildmon 4, HOPPIP
+	wildmon 4, NIDORAN_M
+	wildmon 4, NIDORAN_M
 	; nite
 	wildmon 3, SPINARAK
 	wildmon 3, HOOTHOOT
@@ -1408,16 +1408,16 @@
 	wildmon 5, BELLSPROUT
 	wildmon 5, PIDGEY
 	wildmon 4, WEEDLE
-	wildmon 5, HOPPIP
-	wildmon 5, HOPPIP
+	wildmon 5, NIDORAN_F
+	wildmon 5, NIDORAN_F
 	; day
 	wildmon 4, PIDGEY
 	wildmon 4, CATERPIE
 	wildmon 5, BELLSPROUT
 	wildmon 5, PIDGEY
 	wildmon 4, WEEDLE
-	wildmon 5, HOPPIP
-	wildmon 5, HOPPIP
+	wildmon 5, NIDORAN_F
+	wildmon 5, NIDORAN_F
 	; nite
 	wildmon 4, SPINARAK
 	wildmon 4, POLIWAG
