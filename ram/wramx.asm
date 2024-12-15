@@ -1240,7 +1240,7 @@ wTimerEventStartDay:: db
 
 wFruitTreeFlags:: flag_array NUM_FRUIT_TREES
 
-wNuzlockeLandmarkFlags:: flag_array NUM_LANDMARKS
+	ds 19 ; previously nuzlocke flags
 
 wHiddenGrottoContents::
 ; dbw content type, content id
@@ -1420,10 +1420,7 @@ wRoamMon1:: roam_struct wRoamMon1
 wRoamMon2:: roam_struct wRoamMon2
 wRoamMon3:: roam_struct wRoamMon3
 
-wRoamMons_CurMapNumber:: db
-wRoamMons_CurMapGroup:: db
-wRoamMons_LastMapNumber:: db
-wRoamMons_LastMapGroup:: db
+	ds 4 ; previously used
 
 wBestMagikarpLengthMm::
 wBestMagikarpLengthMmHi:: db
@@ -1453,6 +1450,8 @@ SECTION "Sound Stack", WRAMX
 
 wSoundEngineBackup:: ds wChannelsEnd - wMusic
 wBackupMapMusic:: db
+wSoundEngineBattleBackup:: ds wChannelsEnd - wMusic
+wBattleBackupMapMusic:: db
 
 
 SECTION "Music Player RAM", WRAMX
