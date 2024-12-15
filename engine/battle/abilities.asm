@@ -46,7 +46,6 @@ StatusHealAbilities:
 	dbw LIMBER, LimberAbility
 	dbw IMMUNITY, ImmunityAbility
 	dbw PASTEL_VEIL, PastelVeilAbility
-	dbw WATER_VEIL, WaterVeilAbility
 	dbw INSOMNIA, InsomniaAbility
 	dbw VITAL_SPIRIT, VitalSpiritAbility
 	dbw OWN_TEMPO, OwnTempoAbility

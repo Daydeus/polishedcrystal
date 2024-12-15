@@ -183,6 +183,7 @@ ShellArmorDescription:
 	done
 
 SturdyDescription:
+WaterVeilDescription:
 	text  "Cannot be knocked"
 	next1 "out with one hit."
 	done
@@ -348,11 +349,6 @@ InnerFocusDescription:
 MagmaArmorDescription:
 	text  "Boosts Defense when"
 	next1 "hit by Water."
-	done
-
-WaterVeilDescription:
-	text  "Prevents it from"
-	next1 "getting a burn."
 	done
 
 MagnetPullDescription:

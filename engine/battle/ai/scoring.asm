@@ -2566,11 +2566,11 @@ AI_Status:
 	lb de, ELECTRIC, 1
 	jr .checkstatus
 .burn
-	lb bc, WATER_VEIL, HELD_PREVENT_BURN
+	ld b, HELD_PREVENT_BURN
 	lb de, FIRE, 0
 	jr .checkstatus
 .freeze
-	lb bc, MAGMA_ARMOR, HELD_PREVENT_FREEZE
+	ld b, HELD_PREVENT_FREEZE
 	lb de, ICE, 0
 	jr .checkstatus
 .sleep

@@ -2540,7 +2540,7 @@ BattleCommand_applydamage:
 ; b is set to an endure flag as follows:
 ; 0 - Nothing
 ; 1 - Endure (the move)
-; 2 - Ability (i.e. Sturdy)
+; 2 - Ability (i.e. Sturdy, Water Veil)
 ; 3 - Nonconsumable item (i.e. Focus Band)
 ; 4 - Item consumed after use (i.e. Focus Sash)
 ; 5 - High Affection
@@ -2576,6 +2576,8 @@ BattleCommand_applydamage:
 	call GetOpponentAbilityAfterMoldBreaker
 	ld b, $2
 	cp STURDY
+	jr z, .sturdy
+	cp WATER_VEIL
 	jr nz, .no_endure
 .sturdy
 	push bc
