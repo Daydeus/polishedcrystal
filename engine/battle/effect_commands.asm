@@ -5194,9 +5194,6 @@ BattleCommand_freezetarget:
 	ld a, b
 	cp HELD_PREVENT_FREEZE
 	ret z
-	call GetOpponentAbilityAfterMoldBreaker
-	cp MAGMA_ARMOR
-	ret z
 	call IsLeafGuardActive
 	ret z
 	ld a, [wEffectFailed]

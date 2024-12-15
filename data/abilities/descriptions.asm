@@ -346,8 +346,8 @@ InnerFocusDescription:
 	done
 
 MagmaArmorDescription:
-	text  "Prevents it from"
-	next1 "becoming frozen."
+	text  "Boosts Defense when"
+	next1 "hit by Water."
 	done
 
 WaterVeilDescription:

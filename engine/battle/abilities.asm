@@ -46,7 +46,6 @@ StatusHealAbilities:
 	dbw LIMBER, LimberAbility
 	dbw IMMUNITY, ImmunityAbility
 	dbw PASTEL_VEIL, PastelVeilAbility
-	dbw MAGMA_ARMOR, MagmaArmorAbility
 	dbw WATER_VEIL, WaterVeilAbility
 	dbw INSOMNIA, InsomniaAbility
 	dbw VITAL_SPIRIT, VitalSpiritAbility
@@ -82,9 +81,6 @@ PastelVeilAbility:
 	jr HealStatusAbility
 WaterVeilAbility:
 	ld a, 1 << BRN
-	jr HealStatusAbility
-MagmaArmorAbility:
-	ld a, 1 << FRZ
 	jr HealStatusAbility
 LimberAbility:
 	ld a, 1 << PAR
@@ -975,6 +971,7 @@ NullificationAbilities:
 	dbw SAP_SIPPER, SapSipperAbility
 	dbw VOLT_ABSORB, VoltAbsorbAbility
 	dbw WATER_ABSORB, WaterAbsorbAbility
+	dbw MAGMA_ARMOR, MagmaArmorAbility
 	dbw DAMP, CannotUseTextAbility
 	dbw ARMOR_TAIL, CannotUseTextAbility
 	dbw -1, -1
@@ -1042,6 +1039,10 @@ AttackUpAbility:
 LightningRodAbility:
 	ld b, SP_ATTACK
 	jr StatUpAbility
+MagmaArmorAbility:
+DefenseUpAbility:
+	ld b, DEFENSE
+	jr StatUpAbility
 RattledAbility:
 	; only for bug-, dark or ghost type moves
 	ld a, c
@@ -1071,6 +1072,8 @@ StatUpAbility:
 	cp LIGHTNING_ROD
 	jr z, .print_immunity
 	cp MOTOR_DRIVE
+	jr z, .print_immunity
+	cp MAGMA_ARMOR
 	jr z, .print_immunity
 	cp SAP_SIPPER
 	jr nz, .done

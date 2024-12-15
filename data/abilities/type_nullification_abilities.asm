@@ -4,6 +4,7 @@ TypeNullificationAbilities:
 	db MOTOR_DRIVE,   ELECTRIC
 	db DRY_SKIN,      WATER
 	db WATER_ABSORB,  WATER
+	db MAGMA_ARMOR,   WATER
 	db FLASH_FIRE,    FIRE
 	db SAP_SIPPER,    GRASS
 ; Levitate is checked seperately due to Iron Ball shenanigans
