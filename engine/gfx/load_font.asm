@@ -41,7 +41,7 @@ LoadStandardFontPointer::
 	ret
 
 .FontPointers:
-	table_width 2, LoadStandardFontPointer.FontPointers
+	table_width 2
 	dw FontNormal
 	dw FontNarrow
 	dw FontBold
@@ -75,6 +75,24 @@ _LoadFrame::
 
 LoadBattleFontsHPBar:
 	call _LoadFontsBattleExtra
+
+LoadSummaryStatusIcon:
+	push de
+	xor a
+	ld de, wTempMonStatus
+	farcall GetStatusConditionIndex
+	ld hl, SummaryStatusIconGFX
+	ld bc, 2 tiles
+	rst AddNTimes
+	ld d, h
+	ld e, l
+	ld hl, vTiles0 tile SUMMARY_TILE_OAM_STATUS
+	lb bc, BANK(SummaryStatusIconGFX), 2
+	call Request2bpp
+	farcall LoadSummaryStatusIconPalette
+	farcall ApplyOBPals
+	pop de
+	ret
 
 LoadPlayerStatusIcon:
 	push de

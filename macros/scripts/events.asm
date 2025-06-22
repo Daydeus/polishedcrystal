@@ -1,4 +1,4 @@
-; ScriptCommandTable indexes (see engine/overworld/scripting.asm)
+; RunScriptCommand.Jumptable indexes (see engine/overworld/scripting.asm)
 	const_def
 
 	const scall_command
@@ -1066,14 +1066,6 @@ MACRO gettrainerclassname
 	db \2 ; memory
 ENDM
 
-	const getname_command
-MACRO getname
-	db getname_command
-	db \1 ; type
-	db \2 ; id
-	db \3 ; memory
-ENDM
-
 	const wait_command
 MACRO wait
 	db wait_command
@@ -1368,6 +1360,43 @@ ENDM
 MACRO scalltable
 	db scalltable_command
 	dw \1 ; pointer table
+ENDM
+
+	const setmapobjectmovedata_command
+MACRO setmapobjectmovedata
+	db setmapobjectmovedata_command
+	db \1 ; person
+	db \2 ; SpriteMovementData index
+ENDM
+
+	const setmapobjectpal_command
+MACRO setmapobjectpal
+	db setmapobjectpal_command
+	db \1 ; person
+	db \2 ; palette
+ENDM
+
+	const givespecialitem_command
+MACRO givespecialitem
+	db givespecialitem_command
+	db \1 ; key item
+ENDM
+
+	const givebadge_command
+MACRO givebadge
+	db givebadge_command
+	dn \2, \1 ; region, badge
+ENDM
+
+	const setquantity_command
+MACRO setquantity
+	db setquantity_command
+ENDM
+
+	const pluralize_command
+MACRO pluralize
+	db pluralize_command
+	dw \1 ; pointer
 ENDM
 
 DEF NUM_EVENT_COMMANDS EQU const_value

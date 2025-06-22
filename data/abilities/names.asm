@@ -1,5 +1,5 @@
 AbilityNames:
-	table_width 2, AbilityNames
+	table_width 2
 	dw NoAbility
 	dw Stench
 	dw Drizzle
@@ -144,16 +144,17 @@ AbilityNames:
 	dw Galvanize
 	dw Corrosion
 	dw TanglingHair
+	dw ScreenCleaner
+	dw SteelySpirit
+	dw PerishBody
 	dw GorillaTactics
 	dw NeutralizingGas
 	dw PastelVeil
 	dw QuickDraw
-	dw SteelySpirit
-	dw PerishBody
-	dw ScreenCleaner
 	dw CudChew
 	dw Sharpness
 	dw ArmorTail
+	dw MindsEye
 	assert_table_length NUM_ABILITIES
 
 NoAbility:       rawchar "---@"
@@ -300,13 +301,14 @@ SlushRush:       rawchar "Slush Rush@"
 Galvanize:       rawchar "Galvanize@"
 Corrosion:       rawchar "Corrosion@"
 TanglingHair:    rawchar "Tangling Hair@"
+ScreenCleaner:   rawchar "Screen Cleaner@"
+SteelySpirit:    rawchar "Steely Spirit@"
+PerishBody:      rawchar "Perish Body@"
 GorillaTactics:  rawchar "Gorilla Tactics@"
 NeutralizingGas: rawchar "Neutralizing Gas@"
 PastelVeil:      rawchar "Pastel Veil@"
 QuickDraw:       rawchar "Quick Draw@"
-SteelySpirit:    rawchar "Steely Spirit@"
-PerishBody:      rawchar "Perish Body@"
-ScreenCleaner:   rawchar "Screen Cleaner@"
 CudChew:         rawchar "Cud Chew@"
 Sharpness:       rawchar "Sharpness@"
 ArmorTail:       rawchar "Armor Tail@"
+MindsEye:        rawchar "Mind's Eye@"

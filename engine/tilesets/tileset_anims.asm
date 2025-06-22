@@ -38,13 +38,13 @@ TilesetJohto5Anim::
 	dw vTiles2 tile $1c, AnimateRainPuddleTile
 	dw vTiles2 tile $1d, AnimateRainWaterTile
 	dw NULL,  DoNothing
-	dw NULL,  DoNothing
 	dw NULL,  AnimateFlowerTile
 	dw WhirlpoolFrames1, AnimateWhirlpoolTile
 	dw WhirlpoolFrames2, AnimateWhirlpoolTile
 	dw WhirlpoolFrames3, AnimateWhirlpoolTile
 	dw WhirlpoolFrames4, AnimateWhirlpoolTile
-	dw NULL,  DoNothing
+	dw vTiles2 tile $1c, AnimateRainPuddleTile
+	dw vTiles2 tile $1d, AnimateRainWaterTile
 	dw NULL,  StandingTileFrame8
 	dw vTiles2 tile $35, WriteTileToBuffer
 	dw NULL,  DoNothing
@@ -1197,7 +1197,7 @@ FlickeringCaveEntrancePalette:
 	ld a, BANK(wBGPals1)
 	ldh [rSVBK], a
 
-	ld a, %10100000 ; auto-increment, index $20 (pal 4 color 0)
+	ld a, (1 << rBGPI_AUTO_INCREMENT) | (0 palette 4)
 	ldh [rBGPI], a
 
 	ldh a, [hVBlankCounter]

@@ -2,7 +2,7 @@ if DEF(HGSS) && (DEF(MONOCHROME) || DEF(NOIR)) || (DEF(MONOCHROME) && DEF(NOIR))
 fail "'make' cannot combine 'hgss', 'monochrome', and 'noir'."
 endc
 
-INCLUDE "charmap.asm"
+INCLUDE "constants/charmap.asm"
 
 INCLUDE "macros/asserts.asm"
 INCLUDE "macros/const.asm"
@@ -75,8 +75,10 @@ INCLUDE "constants/sprite_anim_constants.asm"
 INCLUDE "constants/sprite_constants.asm"
 INCLUDE "constants/sprite_data_constants.asm"
 INCLUDE "constants/std_constants.asm"
+INCLUDE "constants/summary_constants.asm"
 INCLUDE "constants/tileset_constants.asm"
 INCLUDE "constants/trainer_constants.asm"
 INCLUDE "constants/trainer_data_constants.asm"
 INCLUDE "constants/type_constants.asm"
 INCLUDE "constants/weather_constants.asm"
+INCLUDE "constants/printer_constants.asm"

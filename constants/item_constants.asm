@@ -6,7 +6,7 @@
 ; - ItemAttributes (see data/items/attributes.asm)
 ; - ItemIconPointers (see data/items/icon_pointers.asm)
 ; - ItemIconPalettes (see gfx/items/items.pal)
-; - ItemEffects (see engine/items/item_effects.asm)
+; - _DoItemEffect.ItemEffects (see engine/items/item_effects.asm)
 	const_def
 	const NO_ITEM      ; 00
 DEF PARK_BALL EQU NO_ITEM
@@ -276,7 +276,7 @@ DEF NUM_STONES EQU const_value - FIRST_STONE
 	const POWER_ANKLET ; d5
 
 	const DRAGON_SCALE ; d6
-	const UP_GRADE     ; d7
+	const UPGRADE      ; d7
 	const DUBIOUS_DISC ; d8
 	const PROTECTOR    ; d9
 	const ELECTIRIZER  ; da
@@ -581,7 +581,7 @@ endc
 	const NAM_TOXIC_ORB
 	const NAM_TWISTEDSPOON
 	const NAM_ULTRA_BALL
-	const NAM_UP_GRADE
+	const NAM_UPGRADE
 	const NAM_WATER_STONE
 	const NAM_WEAK_POLICY
 	const NAM_WHITE_HERB
@@ -618,6 +618,15 @@ DEF NUM_APRICORNS EQU const_value - 1
 	const CLEVER_WING ; 5
 DEF NUM_WINGS EQU const_value
 
+; CANDY_JAR contents
+	const_def 1
+	const EXP_CANDY_XS ; 1
+	const EXP_CANDY_S  ; 2
+	const EXP_CANDY_M  ; 3
+	const EXP_CANDY_L  ; 4
+	const EXP_CANDY_XL ; 5
+DEF NUM_CANDIES EQU const_value - 1
+
 ; key item ids
 ; indexes for:
 ; - KeyItemNames (see data/items/key_names.asm)
@@ -625,7 +634,7 @@ DEF NUM_WINGS EQU const_value
 ; - KeyItemAttributes (see data/items/attributes.asm)
 ; - KeyItemIconPointers (see data/items/icon_pointers.asm)
 ; - KeyItemIconPalettes (see gfx/items/key_items.pal)
-; - KeyItemEffects (see engine/items/item_effects.asm)
+; - DoKeyItemEffect.KeyItemEffects (see engine/items/item_effects.asm)
 	const_def 1
 	const BICYCLE      ; 01
 	const OLD_ROD      ; 02
@@ -635,36 +644,38 @@ DEF NUM_WINGS EQU const_value
 	const COIN_CASE    ; 06
 	const APRICORN_BOX ; 07
 	const WING_CASE    ; 08
-	const TYPE_CHART   ; 09
-	const GBC_SOUNDS   ; 0a
-	const BLUE_CARD    ; 0b
-	const SQUIRTBOTTLE ; 0c
-	const SILPHSCOPE2  ; 0d
-	const MYSTERY_EGG  ; 0e
-	const SECRETPOTION ; 0f
-	const GO_GOGGLES   ; 10
-	const RED_SCALE    ; 11
-	const CARD_KEY     ; 12
-	const BASEMENT_KEY ; 13
-	const LOST_ITEM    ; 14
-	const MACHINE_PART ; 15
-	const RAINBOW_WING ; 16
-	const SILVER_WING  ; 17
-	const CLEAR_BELL   ; 18
-	const GS_BALL      ; 19
-	const S_S_TICKET   ; 1a
-	const PASS         ; 1b
-	const ORANGETICKET ; 1c
-	const MYSTICTICKET ; 1d
-	const OLD_SEA_MAP  ; 1e
-	const HARSH_LURE   ; 1f
-	const POTENT_LURE  ; 20
-	const MALIGN_LURE  ; 21
+	const CANDY_JAR    ; 09
+	const TYPE_CHART   ; 0a
+	const GBC_SOUNDS   ; 0b
+	const BLUE_CARD    ; 0c
+	const SQUIRTBOTTLE ; 0d
+	const SILPHSCOPE2  ; 0e
+	const MYSTERY_EGG  ; 0f
+	const SECRETPOTION ; 10
+	const GO_GOGGLES   ; 11
+	const RED_SCALE    ; 12
+	const CARD_KEY     ; 13
+	const BASEMENT_KEY ; 14
+	const LOST_ITEM    ; 15
+	const MACHINE_PART ; 16
+	const RAINBOW_WING ; 17
+	const SILVER_WING  ; 18
+	const CLEAR_BELL   ; 19
+	const GS_BALL      ; 1a
+	const S_S_TICKET   ; 1b
+	const PASS         ; 1c
+	const ORANGETICKET ; 1d
+	const MYSTICTICKET ; 1e
+	const OLD_SEA_MAP  ; 1f
+	const LIFT_KEY     ; 20
+	const HARSH_LURE   ; 21
+	const POTENT_LURE  ; 22
+	const MALIGN_LURE  ; 23
 DEF CHARMS_START EQU const_value
 	; Only charms below this point!
-	const SHINY_CHARM  ; 22
-	const OVAL_CHARM   ; 23
-	const CATCH_CHARM  ; 24
+	const SHINY_CHARM  ; 24
+	const OVAL_CHARM   ; 25
+	const CATCH_CHARM  ; 26
 DEF NUM_KEY_ITEMS EQU const_value - 1
 
 ; Alphabetical order (see data/items/name_order.asm)
@@ -673,6 +684,7 @@ DEF NUM_KEY_ITEMS EQU const_value - 1
 	const NAM_BASEMENT_KEY
 	const NAM_BICYCLE
 	const NAM_BLUE_CARD
+	const NAM_CANDY_JAR
 	const NAM_CARD_KEY
 	const NAM_CATCH_CHARM
 	const NAM_CLEAR_BELL
@@ -683,6 +695,7 @@ DEF NUM_KEY_ITEMS EQU const_value - 1
 	const NAM_GS_BALL
 	const NAM_HARSH_LURE
 	const NAM_ITEMFINDER
+	const NAM_LIFT_KEY
 	const NAM_LOST_ITEM
 	const NAM_MACHINE_PART
 	const NAM_MALIGN_LURE
@@ -706,3 +719,18 @@ DEF NUM_KEY_ITEMS EQU const_value - 1
 	const NAM_TYPE_CHART
 	const NAM_WING_CASE
 	assert const_value - 1 == NUM_KEY_ITEMS
+
+; special items ids
+; story items that have names and icons but do not go in the bag
+; Pokegear must be highest value due to special palette handling
+; indexes for:
+; - SpecialItemNames (see data/items/special_names.asm)
+; - SpecialItemIconPointers (see data/items/icon_pointers.asm)
+; - SpecialItemIconPalettes (see gfx/items/special_items.pal)
+	const_def
+	const POKEDEX
+	const MAP_CARD
+	const RADIO_CARD
+	const EXPN_CARD
+	const POKEGEAR
+DEF NUM_SPECIAL_ITEMS EQU const_value

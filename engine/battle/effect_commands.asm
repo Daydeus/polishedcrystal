@@ -87,6 +87,9 @@ DoTurn:
 
 .not_ghost
 ; Read in and execute the user's move effects for this turn.
+	xor a
+	ld [wMoveHitState], a
+
 	; Clear physical/special move use for user.
 	; For Counter/Mirror Coat, we store last damage done.
 	; This damage is stored alongside flags for whether it was physical
@@ -120,20 +123,12 @@ DoTurn:
 	ret nz
 
 	call UpdateMoveData
-
+	; fallthrough
 DoMove:
 ; Get the user's move effect.
 	; Increase move usage counter if applicable
 	call IncreaseMetronomeCount
-	ld a, BATTLE_VARS_MOVE_EFFECT
-	call GetBattleVar
-	ld c, a
-	ld b, 0
-	ld hl, MoveEffectsPointers
-	add hl, bc
-	add hl, bc
-	ld a, BANK(MoveEffectsPointers)
-	call GetFarWord
+	call GetMoveScript
 
 	ld a, l
 	ld [wBattleScriptBufferLoc], a
@@ -268,13 +263,13 @@ BattleCommand_checkturn:
 	; a is still (user's ability - EARLY_BIRD)
 	and a
 	jr nz, .woke_up_no_early_bird
-	farcall DisableAnimations
+	farcall BeginAbility
 	farcall ShowAbilityActivation
 .woke_up_no_early_bird
 	ld hl, WokeUpText
 	call StdBattleTextbox
 	; does nothing in case we never showed an ability activation
-	farcall EnableAnimations
+	farcall EndAbility
 	ldh a, [hBattleTurn]
 	and a
 	jr nz, .enemy1
@@ -334,7 +329,7 @@ BattleCommand_checkturn:
 	jmp EndTurn
 
 .thaw
-	call BattleCommand_defrost
+	call DefrostUser
 
 .not_frozen
 	ld a, BATTLE_VARS_SUBSTATUS3
@@ -709,7 +704,7 @@ HitConfusion:
 	call StdBattleTextbox
 
 	xor a
-	ld [wCriticalHit], a
+	ld [wMoveHitState], a
 
 	call HitSelfInConfusion
 	call ConfusedDamageCalc
@@ -723,7 +718,6 @@ HitConfusion:
 	ld a, $1
 	ldh [hBGMapMode], a
 .enemy
-	ld c, $1
 	call TakeOpponentDamage
 	jmp BattleCommand_raisesub
 
@@ -1087,6 +1081,10 @@ BattleCommand_doturn:
 BattleCommand_hastarget:
 	ld a, BATTLE_VARS_MOVE_EFFECT
 	call GetBattleVar
+	cp EFFECT_SPIKES
+	jr z, .allow_fainted
+	cp EFFECT_TOXIC_SPIKES
+	jr z, .allow_fainted
 	cp EFFECT_FLY
 	jr z, .chargeup_move
 	cp EFFECT_SOLAR_BEAM
@@ -1096,7 +1094,7 @@ BattleCommand_hastarget:
 	ld a, BATTLE_VARS_SUBSTATUS3
 	call GetBattleVar
 	and 1 << SUBSTATUS_CHARGED
-	jr z, .not_fainted
+	jr z, .allow_fainted
 
 .regular
 	; If the target is fainted, abort the move
@@ -1108,6 +1106,12 @@ BattleCommand_hastarget:
 	call StdBattleTextbox
 	call CantMove
 	jmp EndMoveEffect
+
+.allow_fainted
+	; We still need to check if the target is fainted, because if they are, we
+	; should not proc Pressure.
+	call HasOpponentFainted
+	ret z
 
 .not_fainted
 	; Handle Pressure
@@ -1166,8 +1170,7 @@ BattleConsumePP:
 
 BattleCommand_critical:
 ; Determine whether this attack's hit will be critical.
-	xor a
-	ld [wCriticalHit], a
+	call ResetCrit
 
 	ld a, BATTLE_VARS_MOVE_POWER
 	call GetBattleVar
@@ -1259,18 +1262,51 @@ BattleCommand_critical:
 	cp b
 	ret nc
 .guranteed_crit
-	ld a, 1
-	ld [wCriticalHit], a
+	; fallthrough
+SetCrit:
+	ld a, 1 << MOVEHIT_CRITICAL
+	jr SetMoveHitState
+SetSubHit:
+	ld a, 1 << MOVEHIT_SUBSTITUTE
+SetMoveHitState:
+	push hl
+	ld hl, wMoveHitState
+	or [hl]
+	ld [hl], a
+	pop hl
+	ret
+
+ResetCrit:
+	ld a, 1 << MOVEHIT_CRITICAL
+	jr ResetMoveHitState
+ResetSubHit:
+	ld a, 1 << MOVEHIT_SUBSTITUTE
+ResetMoveHitState:
+	push hl
+	ld hl, wMoveHitState
+	cpl
+	and [hl]
+	ld [hl], a
+	pop hl
+	ret
+
+CheckCrit:
+	ld a, 1 << MOVEHIT_CRITICAL
+	jr CheckMoveHitState
+CheckSubHit:
+	ld a, 1 << MOVEHIT_SUBSTITUTE
+CheckMoveHitState:
+	push hl
+	ld hl, wMoveHitState
+	and [hl]
+	pop hl
 	ret
 
 TrueUserValidBattleItem:
 ; Items (and Abilities) never apply to external Future Sight users.
 	call GetFutureSightUser
 	ret nz
-	jr UserValidBattleItem
-
-OpponentValidBattleItem:
-	call StackCallOpponentTurn
+	; fallthrough
 UserValidBattleItem:
 ; Checks if the user's held item applies to the species+form.
 ; Used for items like Leek, Lucky Punch, Thick Club, etc.
@@ -1504,7 +1540,6 @@ BattleCommand_stab:
 	ret
 
 CheckAirborneAfterMoldBreaker:
-	push de
 	call SwitchTurn
 	call GetOpponentAbilityAfterMoldBreaker
 	ld b, a
@@ -1512,7 +1547,6 @@ CheckAirborneAfterMoldBreaker:
 	jr CheckAirborne_GotAbility
 
 CheckAirborne:
-	push de
 	call GetTrueUserAbility
 	ld b, a
 CheckAirborne_GotAbility:
@@ -1522,6 +1556,7 @@ CheckAirborne_GotAbility:
 ; ATKFAIL_ABILITY for Levitate.
 
 	; Check Iron Ball
+	push de
 	push bc
 	predef GetUserItemAfterUnnerve
 	ld a, b
@@ -1670,6 +1705,8 @@ _CheckTypeMatchup:
 	jr nz, .end
 	call GetTrueUserAbility
 	cp SCRAPPY
+	jr z, .end
+	cp MINDS_EYE
 	jr nz, .TypesLoop
 .end
 	pop hl
@@ -1783,6 +1820,8 @@ BattleCommand_resettypematchup:
 	ld [wTypeModifier], a
 	ret
 
+INCLUDE "data/moves/powder_moves.asm"
+
 BattleCommand_damagevariation:
 ; Modify the damage spread between 85% and 100%.
 
@@ -1886,8 +1925,6 @@ BattleCommand_checkhit:
 	ret z
 	cp EFFECT_COUNTER
 	ret z
-	cp EFFECT_MIRROR_COAT
-	ret z
 	ld a, BATTLE_VARS_MOVE_ANIM
 	call GetBattleVar
 	inc a ; cp STRUGGLE
@@ -1944,6 +1981,8 @@ BattleCommand_checkhit:
 	cp KEEN_EYE
 	jr z, .avoid_evasion_boost
 	cp ILLUMINATE
+	jr z, .avoid_evasion_boost
+	cp MINDS_EYE
 	jr nz, .check_opponent_unaware
 .avoid_evasion_boost
 	ld a, c
@@ -2268,7 +2307,7 @@ BattleCommand_effectchance:
 	push hl
 	xor a
 	ld [wEffectFailed], a
-	call CheckSubstituteOpp
+	call CheckSubHit
 	jr nz, EffectChanceFailed
 
 	call GetOpponentAbilityAfterMoldBreaker
@@ -2445,7 +2484,7 @@ BattleCommand_moveanimnosub:
 	xor 1
 	ld [wBattleAnimParam], a
 	ld a, [de]
-	cp $1
+	dec a
 	push af
 	ld a, BATTLE_VARS_MOVE_ANIM
 	call GetBattleVar
@@ -2459,7 +2498,7 @@ BattleCommand_moveanimnosub:
 
 
 StatUpDownAnim:
-	ld a, [wAnimationsDisabled]
+	ld a, [wInAbility]
 	and a
 	ret nz
 	call _CheckBattleEffects
@@ -2619,11 +2658,11 @@ BattleCommand_applydamage:
 .not_enduring2
 	dec a
 	jr nz, .enduring_with_item
-	farcall DisableAnimations
+	farcall BeginAbility
 	farcall ShowEnemyAbilityActivation
 	ld hl, EnduredText
 	call StdBattleTextbox
-	farjp EnableAnimations
+	farjp EndAbility
 
 .enduring_with_item
 	push af
@@ -2675,14 +2714,9 @@ GetFailureResultText:
 	ld hl, ButItFailedText
 	jr z, .got_text
 	ld hl, AttackMissedText
-	ld a, [wCriticalHit]
-	cp $ff
-	jr nz, .got_text
-	ld hl, UnaffectedText
 .got_text
 	call FailText_CheckOpponentProtect
-	xor a
-	ld [wCriticalHit], a
+	call ResetCrit
 
 	ld a, BATTLE_VARS_MOVE_EFFECT
 	call GetBattleVar
@@ -2700,7 +2734,6 @@ GetFailureResultText:
 	ld a, $1
 	ld [wBattleAnimParam], a
 	call LoadMoveAnim
-	ld c, $1
 	jmp TakeOpponentDamage
 
 FailText_CheckOpponentProtect:
@@ -2780,8 +2813,7 @@ BattleCommand_criticaltext:
 ; Prints the message for critical hits.
 
 ; If there is no message to be printed, wait 20 frames.
-	ld a, [wCriticalHit]
-	and a
+	call CheckCrit
 	jr z, .wait
 
 	; At level 3 affection, critical hit chance is doubled.
@@ -2826,8 +2858,7 @@ BattleCommand_criticaltext:
 	predef FlagPredef ; c still contains wCurBatlteMon
 
 .cont
-	xor a
-	ld [wCriticalHit], a
+	call ResetCrit
 
 	; Maybe it fainted
 	call HasOpponentFainted
@@ -2999,24 +3030,6 @@ BattleCommand_supereffectivetext:
 	ld [wAlreadyExecuted], a
 	jmp SwitchTurn
 
-CheckSheerForceNegation:
-; Check if a secondary effect was suppressed due to Sheer Force.
-; Most likely a bug introduced in Gen V, it is an established
-; mechanic at this point (VII) that if Sheer Force negates the
-; secondary effect of a move, various side effects don't trigger.
-; Returns z if an effect is negated.
-	call GetTrueUserAbility
-	cp SHEER_FORCE
-	ret nz
-	ld a, [wEffectFailed]
-	and a
-	jr z, .ret_nz
-	xor a
-	ret
-.ret_nz
-	or 1
-	ret
-
 ConsumeStolenOpponentItem::
 ; Separate function, since used items/cud chew berry shouldn't (necessarily)
 ; be updated when force-eating a berry via Bug Bite
@@ -3181,17 +3194,26 @@ BattleCommand_posthiteffects:
 	call HandleRampage
 
 	call HasOpponentFainted
-	jr z, .skip_sub_check
-	call CheckSubstituteOpp
+	call nz, CheckSubstituteOpp
 	ret nz
 
-.skip_sub_check
 	ld a, [wAttackMissed]
 	and a
 	ret nz
 
 	farcall RunHitAbilities
 
+	; Defrost target if move is Fire-type.
+	call HasOpponentFainted
+	jr z, .defrost_done
+	call CheckSubHit
+	jr nz, .defrost_done
+	ld a, BATTLE_VARS_MOVE_TYPE
+	call GetBattleVar
+	cp FIRE
+	call z, DefrostOpponent
+
+.defrost_done
 	; Burst air balloons
 	call HasOpponentFainted
 	jr z, .air_balloon_done
@@ -3283,7 +3305,7 @@ BattleCommand_posthiteffects:
 	call GetTrueUserAbility
 	cp MAGIC_GUARD
 	jr z, .rocky_helmet_done
-	predef SubtractHPFromUser
+	farcall SubtractHPFromUser_OverrideFaintOrder
 	call GetOpponentItem
 	call GetCurItemName
 	ld hl, BattleText_UserHurtByItem
@@ -3344,17 +3366,15 @@ BattleCommand_posthiteffects:
 	farjp ResolveOpponentBerserk
 
 .flinch_up:
-	; Ensure that the move doesn't already have a flinch rate.
 	call HasOpponentFainted
 	ret z
 	call GetOpponentAbilityAfterMoldBreaker
 	cp SHIELD_DUST
 	ret z
-	ld a, BATTLE_VARS_MOVE_EFFECT
-	call GetBattleVar
-	cp EFFECT_FLINCH_HIT
-	ret z
-	cp EFFECT_STOMP
+
+	; Ensure that the move doesn't already have a flinch rate.
+	ld b, flinchtarget_command
+	call HasBattleCommand
 	ret z
 
 	; Serene Grace boosts King's Rock
@@ -3373,13 +3393,42 @@ BattleCommand_posthiteffects:
 	call c, FlinchTarget
 	ret
 
+CheckStatHerbsAfterIntimidate:
+	ld hl, wDeferredSwitch
+	ld a, [hl]
+	push af
+	push hl
+	ld [hl], 0
+	call CheckStatHerbs
+	pop hl
+	push hl
+	ld a, [hl]
+	and a
+	jr z, .no_deferred_switch
+
+	; Awful hack: if Neutralizing Gas suppression is on-going, don't induce
+	; another switch...
+	call GetTrueUserAbility
+	inc a
+	jr z, .no_deferred_switch
+	call GetOpponentAbility
+	inc a
+	jr z, .no_deferred_switch
+	farcall DeferredSwitch
+
+.no_deferred_switch
+	pop hl
+	pop af
+	ld [hl], a
+	ret
+
 CheckEndMoveEffects:
 ; Effects handled at move end skipped by Sheer Force negation except for rampage
+	call GetFutureSightUser
+	ret nz
 	call HandleRampage
 	call CheckSheerForceNegation
 	ret z
-	call GetFutureSightUser
-	ret nz
 	call CheckThroatSpray
 
 	; Only check white herb if we didn't do damage
@@ -3619,10 +3668,10 @@ EndMoveDamageChecks:
 	call SwitchTurn
 	call CanStealItem
 	jr nz, .no_pickpocket
-	farcall DisableAnimations
+	farcall BeginAbility
 	farcall ShowAbilityActivation
 	call BattleCommand_thief
-	farcall EnableAnimations
+	farcall EndAbility
 .no_pickpocket
 	jmp SwitchTurn
 
@@ -3718,8 +3767,6 @@ EndMoveDamageChecks:
 	call RaiseStatWithItem
 	jmp SwitchTurn
 
-RaiseOpponentStatWithItem:
-	call StackCallOpponentTurn
 RaiseStatWithItem:
 	ld a, STAT_SKIPTEXT
 	call _RaiseStat
@@ -3755,8 +3802,8 @@ endc
 
 	push bc
 	call GetOpponentItem
-	ld a, [hl]
-	cp METAL_POWDER
+	ld a, b
+	cp HELD_METAL_POWDER
 	pop bc
 	ret nz
 	jr SetDefenseBoost
@@ -3835,20 +3882,9 @@ BattleCommand_damagestats:
 	ld a, MON_ATK
 	call TrueUserPartyAttr
 .atk_ok
-	call GetTrueUserAbility
-	cp INFILTRATOR
-	jr z, .thickcluborlightball
-	ldh a, [hBattleTurn]
-	and a
-	ld a, [wEnemyScreens]
-	jr z, .got_opp_screens
-	ld a, [wPlayerScreens]
-.got_opp_screens
+	call GetOpponentActiveScreens
 	and SCREENS_REFLECT
 	jr z, .thickcluborlightball
-	ld a, [wCriticalHit]
-	and a
-	jr nz, .thickcluborlightball
 	sla c
 	rl b
 	jr .thickcluborlightball
@@ -3889,20 +3925,9 @@ BattleCommand_damagestats:
 	ld a, MON_SAT
 	call TrueUserPartyAttr
 .sat_ok
-	call GetTrueUserAbility
-	cp INFILTRATOR
-	jr z, .lightball
-	ldh a, [hBattleTurn]
-	and a
-	ld a, [wEnemyScreens]
-	jr z, .got_opp_screens2
-	ld a, [wPlayerScreens]
-.got_opp_screens2
+	call GetOpponentActiveScreens
 	and SCREENS_LIGHT_SCREEN
 	jr z, .lightball
-	ld a, [wCriticalHit]
-	and a
-	jr nz, .lightball
 	sla c
 	rl b
 
@@ -3929,9 +3954,37 @@ BattleCommand_damagestats:
 	call TrueUserPartyAttr
 	pop hl
 	ld e, a
+	ret
 
-	ld a, 1
+GetOpponentActiveScreens:
+; Returns the opponent screens after Infiltrator, crits and Brick Break.
+	; Brick Break screen breaking is handled later, so that we can avoid it
+	; if the attack is ineffective. Thus, make it ignore screens here.
+	ld a, BATTLE_VARS_MOVE_EFFECT
+	call GetBattleVar
+	xor EFFECT_BRICK_BREAK
+	jr nz, .no_brick_break
+
+	; Set move anim param to notify that we are breaking screens.
+	call .GetScreen
+	ld [wBattleAnimParam], a
+	xor a
+	ret
+
+.no_brick_break
+	call GetTrueUserAbility
+	xor INFILTRATOR
+	ret z
+
+	call CheckCrit
+	ret nz
+	; fallthrough
+.GetScreen:
+	ldh a, [hBattleTurn]
 	and a
+	ld a, [wEnemyScreens]
+	ret z
+	ld a, [wPlayerScreens]
 	ret
 
 TruncateHL_BC:
@@ -4031,37 +4084,24 @@ BattleCommand_clearmissdamage:
 
 HitSelfInConfusion:
 	call ResetDamage
-	ldh a, [hBattleTurn]
-	and a
-	ld hl, wBattleMonDefense
-	ld de, wPlayerScreens
-	ld a, [wBattleMonLevel]
-	jr z, .got_it
-
-	ld hl, wEnemyMonDefense
-	ld de, wEnemyScreens
-	ld a, [wEnemyMonLevel]
-.got_it
-	push af
-	ld a, [hli]
+	ld hl, wBattleMonLevel
+	call GetUserMonAttr
+	; e = Level
+	ld e, [hl]
+	ld bc, wBattleMonDefense + 1 - wBattleMonLevel
+	assert wBattleMonDefense - 2 == wBattleMonAttack
+	add hl, bc
+	; bc = Defense
+	ld a, [hld]
+	ld c, a
+	ld a, [hld]
 	ld b, a
-	ld c, [hl]
-	ld a, [de]
-	and SCREENS_REFLECT
-	jr z, .mimic_screen
-
-	sla c
-	rl b
-.mimic_screen
-	dec hl
-	dec hl
-	dec hl
-	ld a, [hli]
-	ld l, [hl]
-	ld h, a
+	; hl = Attack
+	ld a, [hld]
+	ld h, [hl]
+	ld l, a
 	call TruncateHL_BC
 	ld d, 40
-	pop af
 	ld e, a
 	ret
 
@@ -4103,8 +4143,7 @@ ApplyStatBoostDamage:
 	cp 7
 	jr nc, GotStatLevel
 	ld b, a
-	ld a, [wCriticalHit]
-	and a
+	call CheckCrit
 	ret nz
 	ld a, b
 	jr GotStatLevel
@@ -4117,8 +4156,7 @@ ApplyDefStatBoostDamage:
 	cp 7
 	ld b, a
 	jr c, .no_crit_negation
-	ld a, [wCriticalHit]
-	and a
+	call CheckCrit
 	ret nz
 .no_crit_negation
 	ld a, 14
@@ -4249,8 +4287,7 @@ BattleCommand_damagecalc:
 
 .no_flash_fire
 	; Critical hits
-	ld a, [wCriticalHit]
-	and a
+	call CheckCrit
 	jr z, .no_crit
 
 	call GetTrueUserAbility
@@ -4604,19 +4641,6 @@ TakeOpponentDamage:
 	or b
 	jr z, .did_no_damage
 
-	ld a, c
-	and a
-	jr nz, .mimic_sub_check
-
-	ld a, BATTLE_VARS_SUBSTATUS4
-	call GetBattleVar
-	bit SUBSTATUS_SUBSTITUTE, a
-	jr z, .mimic_sub_check
-	call SwitchTurn
-	call SelfInflictDamageToSubstitute
-	jmp SwitchTurn
-
-.mimic_sub_check
 	ld a, [hld]
 	ld c, a
 	ld b, [hl]
@@ -4626,6 +4650,7 @@ TakeOpponentDamage:
 
 TakeDamage:
 ; opponent takes damage
+	call ResetSubHit
 	ld hl, wCurDamage
 	ld a, [hli]
 	ld b, a
@@ -4650,6 +4675,7 @@ TakeDamage:
 	jmp RefreshBattleHuds
 
 SelfInflictDamageToSubstitute:
+	call SetSubHit
 	ld hl, SubTookDamageText
 	call StdBattleTextbox
 
@@ -4765,10 +4791,7 @@ UpdateMoveData:
 
 IsOpponentLeafGuardActive:
 	call GetTrueUserAbility
-	jr DoLeafGuardCheck
-IsLeafGuardActive:
-; returns z if leaf guard applies for enemy
-	call GetOpponentAbilityAfterMoldBreaker
+	; fallthrough
 DoLeafGuardCheck:
 	cp LEAF_GUARD
 	ret nz
@@ -4832,11 +4855,11 @@ BattleCommand_sleep:
 	jmp StdBattleTextbox
 
 .ability_ok
-	farcall DisableAnimations
+	farcall BeginAbility
 	farcall ShowEnemyAbilityActivation
 	call AnimateFailedMove
 	call PrintDoesntAffect
-	farjp EnableAnimations
+	farjp EndAbility
 
 CanPoisonTarget:
 	ld a, b
@@ -4861,11 +4884,21 @@ CanSleepTarget:
 	lb bc, -1, -1
 	lb de, INSOMNIA, HELD_PREVENT_SLEEP
 	ld h, SLP_MASK
+	jr CanStatusTarget
+CanFreezeTarget:
+	; Harsh sunlight prevents freeze.
+	call GetWeatherAfterOpponentUmbrella
+	cp WEATHER_SUN
+	ret z
+	ld a, b
+	lb bc, ICE, ICE
+	lb de, MAGMA_ARMOR, HELD_PREVENT_FREEZE
+	ld h, 1 << FRZ
 CanStatusTarget:
 ; Input:
 ; a=0: Check Mold Breaker and Substitute (user directly poisoning foe)
 ; a=1: Ignore MB and sub (Toxic Spikes, target on-contact abilities)
-; a=2: Ignore MB and sub, check victim for Corrosion (Toxic Orb)
+; a=2: Ignore MB, sub, and Safeguard, check victim for Corrosion (Toxic Orb)
 ; bc: Type immunities
 ; d: Ability immunity
 ; e: Item immunity
@@ -4874,6 +4907,7 @@ CanStatusTarget:
 ;     z -- we can
 ;  c|nz -- we can't, due to ability
 ; nc|nz -- we can't, failure msg in HL
+	and a
 	push af
 	ld a, BATTLE_VARS_STATUS_OPP
 	call GetBattleVar
@@ -4886,9 +4920,7 @@ CanStatusTarget:
 	jr nz, .not_corrosive
 
 	pop af
-	and a
 	push af
-	and a
 	jr z, .check_psn_status_move
 	dec a
 	jr z, .not_corrosive
@@ -4934,12 +4966,19 @@ CanStatusTarget:
 	pop de
 	cp e
 	jr z, .cant_item
+
+	; Toxic/Flame Orb bypasses Safeguard.
 	pop af
-	and a
-	jr nz, .no_mold_breaker
+	push af
+	cp 2
+	jr z, .no_safeguard
 	call SafeCheckSafeguard
 	ld hl, SafeguardProtectText
-	jr nz, .end
+	jr nz, .pop_and_end
+
+.no_safeguard
+	pop af ; "and a" was performed earlier.
+	jr nz, .no_mold_breaker
 	call CheckSubstituteOpp
 	ld hl, ButItFailedText
 	jr nz, .end
@@ -4995,39 +5034,14 @@ CanStatusTarget:
 .pop_and_end
 	pop af
 .end
+	; return nc|nz -- we can't, failure msg in HL
 	or 1
 	ret
 .cant_ability
-	xor a
-	cp 1
+	; return c|nz -- we can't, due to ability
+	scf
+	sbc a
 	ret
-
-BattleCommand_poisontarget:
-	ld b, 0
-	call CanPoisonTarget
-	ret nz
-	ld a, [wTypeModifier]
-	and a
-	ret z
-	ld a, [wEffectFailed]
-	and a
-	ret nz
-
-	call PoisonOpponent
-	ld de, ANIM_PSN
-	call PlayOpponentBattleAnim
-	call RefreshBattleHuds
-
-	ld hl, WasPoisonedText
-	call StdBattleTextbox
-
-	jmp PostStatusWithSynchronize
-
-PoisonOpponent:
-	ld a, BATTLE_VARS_STATUS_OPP
-	call GetBattleVarAddr
-	set PSN, [hl]
-	jmp UpdateOpponentInParty
 
 BattleCommand_draintarget:
 	ld hl, SuckedHealthText
@@ -5078,12 +5092,12 @@ SapHealth:
 
 .damage
 	pop hl
-	farcall DisableAnimations
+	farcall BeginAbility
 	farcall ShowEnemyAbilityActivation
-	predef SubtractHPFromUser
+	farcall SubtractHPFromUser_OverrideFaintOrder
 	ld hl, SuckedUpOozeText
 	call StdBattleTextbox
-	farjp EnableAnimations
+	farjp EndAbility
 
 GetHPAbsorption:
 ; From damage in bc, get resulting absorbed HP
@@ -5118,125 +5132,74 @@ HandleBigRoot:
 	ret
 
 BattleCommand_burntarget:
-	xor a
-	ld [wNumHits], a
-
 	; Needs to be checked here too, because it should prevent defrosting
-	call CheckSubstituteOpp
+	call CheckSubHit
 	ret nz
 	ld a, BATTLE_VARS_STATUS_OPP
-	call GetBattleVarAddr
+	call GetBattleVar
 	and a
-	jr nz, Defrost
-	ld b, a ; a == 0
+	jr z, BurnTarget
+
+	; Defrost from Fire-type moves is handled elsewhere.
+	call CheckSheerForceNegation
+	ret z
+	jr DefrostOpponent
+
+BurnTarget:
+	ld b, 0
 	call CanBurnTarget
 	ret nz
-	ld a, [wTypeModifier]
-	and a
-	ret z
-	ld a, [wEffectFailed]
-	and a
+	ld b, 1 << BRN
+	jr StatusTarget
+BattleCommand_poisontarget:
+	ld b, 0
+	call CanPoisonTarget
 	ret nz
-
-	ld a, BATTLE_VARS_STATUS_OPP
-	call GetBattleVarAddr
-	set BRN, [hl]
-	call UpdateOpponentInParty
-	ld de, ANIM_BRN
-	call PlayOpponentBattleAnim
-	call RefreshBattleHuds
-
-	ld hl, WasBurnedText
-	call StdBattleTextbox
-	jmp PostStatusWithSynchronize
-
-Defrost:
-	ld a, [hl]
-	and 1 << FRZ
-	ret z
-
-	xor a
-	ld [hl], a
-
-	ldh a, [hBattleTurn]
-	and a
-	ld a, [wCurOTMon]
-	ld hl, wOTPartyMon1Status
-	jr z, .ok
-	ld a, [wCurBattleMon]
-	ld hl, wPartyMon1Status
-.ok
-
-	call GetPartyLocation
-	xor a
-	ld [hl], a
-	call UpdateOpponentInParty
-
-	ld hl, DefrostedOpponentText
-	jmp StdBattleTextbox
-
-BattleCommand_freezetarget:
-	xor a
-	ld [wNumHits], a
-	call CheckSubstituteOpp
-	ret nz
-	ld a, BATTLE_VARS_STATUS_OPP
-	call GetBattleVarAddr
-	and a
-	ret nz
-	ld a, [wTypeModifier]
-	and a
-	ret z
-	call GetWeatherAfterOpponentUmbrella
-	cp WEATHER_SUN
-	ret z
-	call CheckIfTargetIsIceType
-	ret z
-	call GetOpponentItem
-	ld a, b
-	cp HELD_PREVENT_FREEZE
-	ret z
-	call IsLeafGuardActive
-	ret z
-	ld a, [wEffectFailed]
-	and a
-	ret nz
-	call SafeCheckSafeguard
-	ret nz
-	ld a, BATTLE_VARS_STATUS_OPP
-	call GetBattleVarAddr
-	set FRZ, [hl]
-	call UpdateOpponentInParty
-	ld de, ANIM_FRZ
-	call PlayOpponentBattleAnim
-	call RefreshBattleHuds
-
-	ld hl, WasFrozenText
-	call StdBattleTextbox
-	jmp PostStatus
-
+	ld b, 1 << PSN
+	jr StatusTarget
 BattleCommand_paralyzetarget:
-	xor a
-	ld [wNumHits], a
 	ld b, 0
 	call CanParalyzeTarget
 	ret nz
+	ld b, 1 << PAR
+	jr StatusTarget
+BattleCommand_freezetarget:
+	ld b, 0
+	call CanFreezeTarget
+	ret nz
+	ld b, 1 << FRZ
+	; fallthrough
+StatusTarget:
 	ld a, [wTypeModifier]
 	and a
 	ret z
 	ld a, [wEffectFailed]
 	and a
 	ret nz
-
+	; fallthrough
+DisplayAndSetStatusProblem:
+	xor a
+	ld [wBattleAnimParam], a
 	ld a, BATTLE_VARS_STATUS_OPP
 	call GetBattleVarAddr
-	set PAR, [hl]
+	ld [hl], b
 	call UpdateOpponentInParty
-	ld de, ANIM_PAR
-	call PlayOpponentBattleAnim
+	call DisplayStatusProblem
 	call RefreshBattleHuds
-	call PrintParalyze
 	jmp PostStatusWithSynchronize
+
+DefrostOpponent:
+	call StackCallOpponentTurn
+DefrostUser:
+	ld a, BATTLE_VARS_STATUS
+	call GetBattleVarAddr
+	bit FRZ, [hl]
+	ret z
+	res FRZ, [hl]
+
+	call UpdateUserInParty
+	ld hl, WasDefrostedText
+	jmp StdBattleTextbox
 
 CheckAlreadyExecuted:
 	ld a, [wAlreadyExecuted]
@@ -5341,7 +5304,7 @@ LowerOppStatHit:
 _LowerOppStatHit:
 	or STAT_TARGET | STAT_LOWER | STAT_CANMISS | STAT_SECONDARY | STAT_SILENT
 ChangeStat:
-; b contains stat to alter, or zero if it should be read from the move script
+; b contains stat to alter, or -1 if it should be read from the move script
 	farjp FarChangeStat
 
 ResetMiss:
@@ -5445,7 +5408,7 @@ StatusTargetVerbose:
 	jr .done
 
 .ability_ok
-	farcall DisableAnimations
+	farcall BeginAbility
 	farcall ShowEnemyAbilityActivation
 	ld hl, DoesntAffectText
 .failed
@@ -5453,7 +5416,7 @@ StatusTargetVerbose:
 	call AnimateFailedMove
 	pop hl
 	call StdBattleTextbox
-	farcall EnableAnimations
+	farcall EndAbility
 .done
 	pop af
 	; a contains the status problem we wanted to afflict. So this returns nz.
@@ -5512,6 +5475,8 @@ HandleRampage:
 ; otherwise ends rampage if the attack missed for any reason
 	call HasUserFainted
 	ret z
+	call GetFutureSightUser
+	ret nc
 
 	call CheckRampageStatusAndGetRolloutCount
 	ret z
@@ -5628,35 +5593,6 @@ InvertDeferredSwitch:
 	ld [wDeferredSwitch], a
 	ret
 
-CheckPlayerHasMonToSwitchTo:
-	ld a, [wPartyCount]
-	ld d, a
-	ld e, 0
-	ld bc, PARTYMON_STRUCT_LENGTH
-.loop
-	ld a, [wCurBattleMon]
-	cp e
-	jr z, .next
-
-	ld a, e
-	ld hl, wPartyMon1HP
-	rst AddNTimes
-	ld a, [hli]
-	or [hl]
-	jr nz, .not_fainted
-
-.next
-	inc e
-	dec d
-	jr nz, .loop
-
-	scf
-	ret
-
-.not_fainted
-	and a
-	ret
-
 EndMultihit:
 	ld a, BATTLE_VARS_SUBSTATUS3
 	call GetBattleVar
@@ -5693,14 +5629,11 @@ BattleCommand_endloop:
 	push de
 	farcall ResolveOpponentBerserk
 	pop de
-	ld hl, wStringBuffer1
+	ld hl, wItemQuantityChangeBuffer
 	ld a, [de]
 	swap a
 	and $f
 	ld [hl], a
-	dec a
-	ld hl, Hit1TimeText
-	jr z, .got_hit_n_times_text
 	ld hl, HitNTimesText
 .got_hit_n_times_text
 	jmp StdBattleTextbox
@@ -6018,11 +5951,11 @@ BattleCommand_confuse:
 	call GetOpponentAbilityAfterMoldBreaker
 	cp OWN_TEMPO
 	jr nz, .no_ability_protection
-	farcall DisableAnimations
+	farcall BeginAbility
 	farcall ShowEnemyAbilityActivation
 	ld hl, DoesntAffectText
 	call StdBattleTextbox
-	farjp EnableAnimations
+	farjp EndAbility
 
 .no_ability_protection
 	ld a, BATTLE_VARS_SUBSTATUS3_OPP
@@ -6156,13 +6089,16 @@ BattleCommand_heal:
 	call UpdateUserInParty
 	call RefreshBattleHuds
 	ld hl, RegainedHealthText
-	jmp StdBattleTextbox
+	call StdBattleTextbox
+	call SwitchTurn
+	call PostStatus
+	jmp SwitchTurn
 
 .ability_prevents_rest
-	farcall DisableAnimations
+	farcall BeginAbility
 	farcall ShowAbilityActivation
 	call AnimateFailedMove
-	farjp EnableAnimations
+	farjp EndAbility
 
 .hp_full
 	call AnimateFailedMove
@@ -6243,7 +6179,6 @@ PrintButItFailed:
 	ld hl, ButItFailedText
 	jmp StdBattleTextbox
 
-FailDisable:
 FailAttract:
 FailForesight:
 FailSpikes:
@@ -6254,11 +6189,6 @@ PrintDidntAffect2:
 PrintDidntAffect:
 ; 'it didn't affect'
 	ld hl, DidntAffectText
-	jmp StdBattleTextbox
-
-PrintParalyze:
-; 'paralyzed! maybe it can't attack!'
-	ld hl, ParalyzedText
 	jmp StdBattleTextbox
 
 CheckSubstituteOpp:
@@ -6273,7 +6203,7 @@ CheckSubstituteOpp:
 
 .not_future_sight
 	; don't let move effects impact ability processing
-	ld a, [wAnimationsDisabled]
+	ld a, [wInAbility]
 	and a
 	jr nz, .no_sound_move
 	push bc
@@ -6318,24 +6248,6 @@ CheckUserMove:
 	ld a, 1
 	and a
 	ret
-
-BattleCommand_defrost:
-; Thaw the user.
-
-	ld a, BATTLE_VARS_STATUS
-	call GetBattleVarAddr
-	bit FRZ, [hl]
-	ret z
-	res FRZ, [hl]
-
-	ld a, MON_STATUS
-	call UserPartyAttr
-	res FRZ, [hl]
-
-.done
-	call RefreshBattleHuds
-	ld hl, WasDefrostedText
-	jmp StdBattleTextbox
 
 BoostJumptable:
 	dbw AVALANCHE,  DoAvalanche
@@ -6504,30 +6416,6 @@ BattleCommand_doubleminimizedamage:
 	ld [hl], a
 	ret
 
-_GetTrueUserAbility::
-; Returns current user's ability, or 0 (no ability) for external future sight user
-; Also returns 0 (no ability) if opponent has Neutralizing Gas and user doesn't
-	call GetFutureSightUser
-	jr nz, .external
-
-	ld a, BATTLE_VARS_ABILITY
-	call GetBattleVar
-	push bc
-	ld b, a
-	call GetOpponentAbility
-	cp b
-	jr z, .same_ability
-	cp NEUTRALIZING_GAS
-	ld a, b
-	pop bc
-	ret nz
-.external
-	xor a ; ld a, NO_ABILITY
-	ret
-.same_ability
-	pop bc
-	ret
-
 CheckHiddenOpponent:
 	ld a, BATTLE_VARS_SUBSTATUS3_OPP
 	call GetBattleVar
@@ -6536,11 +6424,6 @@ CheckHiddenOpponent:
 
 GetPlayerItem::
 	ld hl, wBattleMonItem
-	ld b, [hl]
-	jr GetItemHeldEffect
-
-GetEnemyItem::
-	ld hl, wEnemyMonItem
 	ld b, [hl]
 	jr GetItemHeldEffect
 
@@ -6615,12 +6498,8 @@ GetItemHeldEffect:
 	pop hl
 	ret
 
-TryAnimateCurrentMove:
-	call CheckAlreadyExecuted
-	ret nz
-	; fallthrough
 AnimateCurrentMove:
-	ld a, [wAnimationsDisabled]
+	ld a, [wInAbility]
 	and a
 	ret nz
 	push hl
@@ -6634,28 +6513,6 @@ AnimateCurrentMove:
 	call LoadMoveAnim
 	call BattleCommand_raisesub
 	jmp PopBCDEHL
-
-PlayDamageAnim:
-	xor a
-	ld [wFXAnimIDHi], a
-
-	ld a, BATTLE_VARS_MOVE_ANIM
-	call GetBattleVar
-	and a
-	ret z
-
-	ld [wFXAnimIDLo], a
-
-	ldh a, [hBattleTurn]
-	and a
-	ld a, BATTLEANIM_ENEMY_DAMAGE
-	jr z, .player
-	ld a, BATTLEANIM_PLAYER_DAMAGE
-
-.player
-	ld [wNumHits], a
-
-	jr PlayUserBattleAnim
 
 LoadMoveAnim:
 	xor a
@@ -6693,7 +6550,7 @@ CallBattleCore:
 	jmp FarCall_hl
 
 AnimateFailedMove:
-	ld a, [wAnimationsDisabled]
+	ld a, [wInAbility]
 	and a
 	ret nz
 	call BattleCommand_lowersub
@@ -6706,10 +6563,7 @@ BattleCommand_movedelay:
 	jmp DelayFrames
 
 EndMoveEffect:
-	ld b, endmove_command
-	; fallthrough
-SkipToBattleCommand:
-	ld c, 1
+	lb bc, endmove_command, 1
 	jr BattleCommandJump
 SkipToBattleCommandAfter:
 	ld c, 2
@@ -6757,6 +6611,62 @@ BattleCommandJump:
 	ld [wBattleScriptBufferLoc], a
 	ld a, h
 	ld [wBattleScriptBufferLoc + 1], a
+	ret
+
+GetMoveScript:
+	ld a, BATTLE_VARS_MOVE_EFFECT
+	call GetBattleVar
+	ld c, a
+	ld b, 0
+	ld hl, MoveEffectsPointers
+	add hl, bc
+	add hl, bc
+	ld a, BANK(MoveEffectsPointers)
+	jmp GetFarWord
+
+CheckSheerForceNegation:
+; Check if a secondary effect is suppressed due to Sheer Force.
+; Most likely a bug introduced in Gen V, it is an established
+; mechanic at this point (VII) that if Sheer Force negates the
+; secondary effect of a move, various side effects don't trigger.
+; Returns z if an effect is negated.
+	call GetTrueUserAbility
+	cp SHEER_FORCE
+	ret nz
+	ld b, effectchance_command
+	call HasBattleCommand
+	ret z
+	ld b, selfeffectchance_command
+	; fallthrough
+HasBattleCommand:
+; Check if the current move contains battle command b.
+; Return z if it does.
+	push hl
+	push bc
+	call GetMoveScript
+	pop bc
+
+.loop
+	ld a, BANK(MoveEffects)
+	call GetFarByte
+	cp endturn_command
+	jr nc, .not_found
+	cp b
+	jr z, .found
+
+	cp FIRST_MOVEARG_COMMAND
+	jr c, .next
+	cp LAST_MOVEARG_COMMAND + 1
+	jr nc, .next
+	inc hl
+.next
+	inc hl
+	jr .loop
+
+.not_found
+	or 1
+.found
+	pop hl
 	ret
 
 AppearUserLowerSub:

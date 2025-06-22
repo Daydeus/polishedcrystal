@@ -576,8 +576,8 @@ PowerAnkletIcon:: INCBIN "gfx/items/power_anklet.2bpp.lz"
 SECTION "DragonScaleIcon", ROMX
 DragonScaleIcon:: INCBIN "gfx/items/dragon_scale.2bpp.lz"
 
-SECTION "UpGradeIcon", ROMX
-UpGradeIcon:: INCBIN "gfx/items/up_grade.2bpp.lz"
+SECTION "UpgradeIcon", ROMX
+UpgradeIcon:: INCBIN "gfx/items/upgrade.2bpp.lz"
 
 SECTION "DubiousDiscIcon", ROMX
 DubiousDiscIcon:: INCBIN "gfx/items/dubious_disc.2bpp.lz"
@@ -785,6 +785,9 @@ OvalCharmIcon:: INCBIN "gfx/items/oval_charm.2bpp.lz"
 SECTION "CatchCharmIcon", ROMX
 CatchCharmIcon:: INCBIN "gfx/items/catch_charm.2bpp.lz"
 
+SECTION "CandyJarIcon", ROMX
+CandyJarIcon:: INCBIN "gfx/items/candy_jar.2bpp.lz"
+
 SECTION "WingCaseIcon", ROMX
 WingCaseIcon:: INCBIN "gfx/items/wing_case.2bpp.lz"
 
@@ -804,3 +807,27 @@ SECTION "LureIcon", ROMX
 HarshLureIcon::
 PotentLureIcon::
 MalignLureIcon:: INCBIN "gfx/items/lure.2bpp.lz"
+
+SECTION "ExpCandyXSIcon", ROMX
+ExpCandyXSIcon:: INCBIN "gfx/items/exp_candy_xs.2bpp.lz"
+
+SECTION "ExpCandySIcon", ROMX
+ExpCandySIcon:: INCBIN "gfx/items/exp_candy_s.2bpp.lz"
+
+SECTION "ExpCandyMIcon", ROMX
+ExpCandyMIcon:: INCBIN "gfx/items/exp_candy_m.2bpp.lz"
+
+SECTION "ExpCandyLIcon", ROMX
+ExpCandyLIcon:: INCBIN "gfx/items/exp_candy_l.2bpp.lz"
+
+SECTION "ExpCandyXLIcon", ROMX
+ExpCandyXLIcon:: INCBIN "gfx/items/exp_candy_xl.2bpp.lz"
+
+SECTION "LiftKeyIcon", ROMX
+LiftKeyIcon:: INCBIN "gfx/items/lift_key.2bpp.lz"
+
+SECTION "PokedexIcon", ROMX
+PokedexItemIcon:: INCBIN "gfx/items/pokedex.2bpp.lz"
+
+SECTION "PokegearIcon", ROMX
+PokegearItemIcon:: INCBIN "gfx/items/pokegear.2bpp.lz"

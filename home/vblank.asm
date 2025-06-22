@@ -45,17 +45,25 @@ VBlank::
 	ld a, [RomHeaderChecksum]
 	ld hl, wRomChecksum
 	cp [hl]
+if !DEF(DEBUG)
 	jr nz, .checksum_crash
+else
+	nop ; no-optimize nops
+	nop ; no-optimize nops
+endc
 	ld a, [RomHeaderChecksum + 1]
 	inc hl ; wRomChecksum + 1
 	cp [hl]
 if !DEF(DEBUG)
 	jr nz, .checksum_crash
+else
+	nop ; no-optimize nops
+	nop ; no-optimize nops
 endc
 
 .skip_crash
 	ldh a, [hVBlank]
-	and %111
+	and %1111
 	add a
 	ld e, a
 	ld d, 0
@@ -99,14 +107,15 @@ endc
 	jr .doGameTime
 
 .VBlanks:
-	dw VBlank0   ; 0
-	dw VBlank1   ; 1
-	dw VBlank2   ; 2
-	dw VBlank1   ; 3
-	dw VBlank4   ; 4 (pokédex)
-	dw VBlank5   ; 5
-	dw VBlank6   ; 6
-	dw VBlank7   ; 7
+	dw VBlank0 ; 0
+	dw VBlank1 ; 1
+	dw VBlank2 ; 2
+	dw VBlank1 ; 3
+	dw VBlank4 ; 4 (pokédex)
+	dw VBlank5 ; 5
+	dw VBlank6 ; 6
+	dw VBlank7 ; 7
+	dw VBlank8 ; 8
 
 VBlank0::
 ; normal operation
@@ -158,6 +167,13 @@ VBlank0::
 	ld hl, hVBlankCounter
 	inc [hl]
 
+	; Increment time since text printing.
+	ld hl, wTimeSinceText
+	inc [hl]
+	jr nz, .no_overflow
+	dec [hl]
+
+.no_overflow
 	; advance random variables
 	call UpdateDividerCounters
 	call AdvanceRNGState
@@ -174,6 +190,7 @@ VBlank0::
 VBlank2::
 VBlankUpdateSound::
 ; sound only
+	ei
 	ld a, BANK(_UpdateSound)
 	rst Bankswitch
 	jmp _UpdateSound ; far-ok
@@ -261,7 +278,6 @@ VBlank4::
 	and 1 << LCD_STAT
 	ldh [rIE], a
 
-	ei
 	call VBlankUpdateSound
 
 	; Ensure that we don't miss an interrupt in the tiny window between di+reti
@@ -332,7 +348,6 @@ VBlank1::
 	xor a
 	ldh [rIF], a
 
-	ei
 	call VBlankUpdateSound
 	di
 
@@ -380,7 +395,6 @@ VBlank5::
 	ldh a, [rIE]
 	push af
 
-	ei
 	call VBlankUpdateSound
 	di
 
@@ -399,3 +413,29 @@ VBlank7::
 	ld a, BANK(VBlankSafeCopyTilemapAtOnce)
 	rst Bankswitch
 	jmp VBlankSafeCopyTilemapAtOnce ; far-ok
+
+VBlank8:
+	; bg map
+	; tiles
+	; oam
+	; joypad
+	; serial
+	; sound
+
+	ldh a, [hROMBank]
+	ldh [hROMBankBackup], a
+
+	call UpdateBGMap
+	call Serve2bppRequest
+
+	call PushOAM
+
+	call Joypad
+
+	farcall AskSerial
+
+	call VBlankUpdateSound
+
+	ldh a, [hROMBankBackup]
+	rst Bankswitch
+	ret

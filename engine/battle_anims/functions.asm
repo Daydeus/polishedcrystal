@@ -12,7 +12,7 @@ DoBattleAnimFrame:
 
 .Jumptable:
 ; entries correspond to BATTLEANIMFUNC_* constants
-	table_width 2, DoBattleAnimFrame.Jumptable
+	table_width 2
 	dw BattleAnimFunction_Null
 	dw BattleAnimFunction_MoveFromUserToTarget
 	dw BattleAnimFunction_MoveFromUserToTargetAndDisappear
@@ -957,7 +957,7 @@ BattleAnimFunction_RazorLeaf:
 	ret
 
 .three
-	ld a, BATTLEANIMFRAMESET_16
+	ld a, BATTLEANIMFRAMESET_RAZOR_LEAF_1
 	call FarReinitBattleAnimFrameset
 	ld hl, BATTLEANIMSTRUCT_OAMFLAGS
 	add hl, bc
@@ -2795,8 +2795,9 @@ BattleAnimFunction_PetalDance:
 	ld hl, BATTLEANIMSTRUCT_VAR2
 	add hl, bc
 	ld a, [hl]
-	cp $28
+	cp $30
 	jr nc, .end
+	inc [hl]
 	inc [hl]
 	ret
 

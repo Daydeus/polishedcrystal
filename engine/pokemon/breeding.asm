@@ -247,9 +247,18 @@ OverworldHatchEgg::
 	call ReanchorMap
 	call LoadStandardMenuHeader
 	call HatchEggs
-	call ExitAllMenus
-	call RestartMapMusic
-	jmp CloseText
+	farcall ClearSavedObjPals
+	farcall DisableDynPalUpdates
+	call ClearBGPalettes
+	call ExitMenu
+	call ReloadTilesetAndPalettes
+	call CloseText
+	call RestoreSprites
+	call UpdateSprites
+	farcall EnableDynPalUpdatesNoApply
+	call FinishExitMenu
+	farcall Script_refreshmap
+	jmp RestartMapMusic
 
 HatchEggs:
 	xor a
@@ -356,6 +365,8 @@ HatchEggs:
 	rst CopyBytes
 
 	; This prints "Huh?" and does the egg hatch animation.
+	ld a, TRUE
+	ld [wSpriteUpdatesEnabled], a ; needed so SafeCopyTilemapAtOnceproperly updates textbox palettes when within nickname menu
 	ld hl, .Text_HatchEgg
 	call PrintText
 
@@ -572,13 +583,15 @@ InheritEggMove:
 	ld b, a
 	; bc = index
 	call GetSpeciesAndFormIndex
-	ld hl, EggMovePointers
+	ld hl, EggSpeciesMovesPointers
 	add hl, bc
 	add hl, bc
-	ld a, BANK(EggMovePointers)
+	ld a, BANK(EggSpeciesMovesPointers)
 	call GetFarWord
+	inc hl
+	inc hl
 .loop
-	ld a, BANK(EggMoves)
+	ld a, BANK(EggSpeciesMoves)
 	call GetFarByte
 	inc a
 	ret z
@@ -672,8 +685,11 @@ EggHatch_AnimationSequence:
 	push af
 	ld e, MUSIC_NONE
 	call PlayMusic
+	farcall FadeOutPalettes
 	farcall BlankScreen
 	call DisableLCD
+	ld a, CGB_PLAIN
+	call GetCGBLayout
 	ld a, " "
 	ld bc, vBGMap1 - vBGMap0
 	hlbgcoord 0, 0
@@ -856,7 +872,7 @@ Special_DayCareMon1:
 	ld c, a
 	ld a, [wBreedMon1Form]
 	ld b, a
-	call PlayCry
+	call PlayMonCry
 	ld a, [wDayCareLady]
 	bit 0, a
 	jr z, DayCareMonCursor
@@ -872,7 +888,7 @@ Special_DayCareMon2:
 	ld c, a
 	ld a, [wBreedMon2Form]
 	ld b, a
-	call PlayCry
+	call PlayMonCry
 	ld a, [wDayCareMan]
 	bit 0, a
 	jr z, DayCareMonCursor

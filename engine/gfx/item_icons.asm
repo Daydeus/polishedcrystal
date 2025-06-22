@@ -28,6 +28,19 @@ _UpdateItemIcon:
 	farcall LoadItemIconPalette
 	jmp SetDefaultBGPAndOBP
 
+UpdateExpCandyIconAndDescriptionAndBagQuantity::
+	farcall UpdateExpCandyDescriptionAndBagQuantity
+	ld hl, ExpCandyIconPointers
+	ld a, [wCurItem]
+	cp NUM_CANDIES + 1
+	jr c, .has_icon
+	xor a
+.has_icon
+	call _LoadItemOrKeyItemIcon
+	farcall LoadExpCandyIconPalette
+	jmp SetDefaultBGPAndOBP
+	ret
+
 UpdateKeyItemIconAndDescription::
 	farcall UpdateKeyItemDescription
 _UpdateKeyItemIcon:
@@ -53,6 +66,17 @@ DecompressItemIconForOverworld::
 	call WhiteOutDecompressedItemIconCorners
 	pop bc
 	ld hl, vTiles0 tile "▲"
+	ld de, wDecompressScratch
+	jmp Request2bppInWRA6
+
+LoadItemIconForSummaryScreen::
+	ld hl, ItemIconPointers
+	call _SetupLoadItemOrKeyItemIcon
+	push bc
+	call FarDecompressWRA6InB
+	call WhiteOutDecompressedItemIconCorners
+	pop bc
+	ld hl, vTiles2 tile SUMMARY_TILE_ITEM
 	ld de, wDecompressScratch
 	jmp Request2bppInWRA6
 
@@ -119,6 +143,13 @@ WhiteOutDecompressedItemIconCorners:
 	and c
 	ld [hl], a
 	ret
+
+ShowSpecialItemIcon::
+	ld a, [wCurSpecialItem]
+	ld hl, SpecialItemIconPointers
+	call _LoadItemOrKeyItemIconForOverworld
+	farcall LoadSpecialItemIconPalette
+	jr PrintOverworldItemIcon
 
 ShowParkBallIcon::
 	ld hl, ParkBallIcon

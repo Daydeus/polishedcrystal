@@ -1,6 +1,6 @@
 MoveDescriptions::
 ; entries correspond to move ids (see constants/move_constants.asm)
-	table_width 2, MoveDescriptions
+	table_width 2
 	dw AcrobaticsDescription
 	dw KarateChopDescription
 	dw DoubleSlapDescription
@@ -519,8 +519,11 @@ WillOWispDescription:
 	next "burn the foe."
 	done
 
-StunSporeDescription:
 ThunderWaveDescription:
+	db   "A move that"
+	next "paralyzes the foe.@"
+
+StunSporeDescription:
 GlareDescription:
 	text "A move that may"
 	next "paralyze the foe."

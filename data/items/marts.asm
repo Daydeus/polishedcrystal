@@ -1,5 +1,5 @@
 Marts:
-	table_width 2, Marts
+	table_width 2
 	dw CherrygroveMart
 	dw CherrygroveMartAfterDex
 	dw VioletMart
@@ -435,7 +435,7 @@ SilphCoMart:
 	db MAX_POTION
 	db MAX_REPEL
 	db DREAM_BALL
-	db UP_GRADE
+	db UPGRADE
 	db DUBIOUS_DISC
 	db -1
 

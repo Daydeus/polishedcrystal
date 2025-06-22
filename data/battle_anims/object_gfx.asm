@@ -9,7 +9,7 @@ ENDM
 
 AnimObjGFX:
 ; entries correspond to ANIM_GFX_* constants
-	table_width 3, AnimObjGFX
+	table_width 3
 	farbank "Battle Anim Graphics"
 	battleanimgfx  0, AnimObj00GFX
 	battleanimgfx 35, AnimObjHitGFX
@@ -66,7 +66,7 @@ AnimObjGFX:
 	battleanimgfx  5, AnimObjStarsGFX
 	battleanimgfx 48, AnimObjUTurnGFX
 	battleanimgfx  5, AnimObjMisc2GFX
-	battleanimgfx 10, AnimObjBeamLightGFX
+	battleanimgfx 10, AnimObjBeamAuroraGFX
 	battleanimgfx  9, AnimObjSmokePuffGFX
 	battleanimgfx 18, AnimObjFocusBlastGFX
 	battleanimgfx 10, AnimObjEnergyBallGFX
@@ -86,6 +86,10 @@ AnimObjGFX:
 	battleanimgfx 28, AnimObjVoltSwitchGFX
 	battleanimgfx 16, AnimObjPsystrikeGFX
 	battleanimgfx 18, AnimObjHurricaneGFX
+	battleanimgfx 12, AnimObjWaterBallGFX
+	battleanimgfx 10, AnimObjBeamSolarGFX
+	battleanimgfx  4, AnimObjPetalsGFX
+	battleanimgfx 10, AnimObjGlowShadowGFX
 	battleanimgfx  1 ; ANIM_GFX_PLAYERHEAD
 	battleanimgfx  1 ; ANIM_GFX_ENEMYFEET
 	battleanimgfx 10, AnimObjPokeBallBGGFX
@@ -93,7 +97,7 @@ AnimObjGFX:
 
 AnimBallObjGFX:
 ; entries correspond to poke ball item constants
-	table_width 2, AnimBallObjGFX
+	table_width 2
 	farbank "Battle Ball Icons"
 	fardw AnimObjParkBallGFX
 	fardw AnimObjPokeBallGFX

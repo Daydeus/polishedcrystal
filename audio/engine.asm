@@ -43,6 +43,8 @@ _InitSound::
 	xor a
 	rst ByteFill
 
+	dec a
+	ld [wCh3LoadedWaveform], a ; initializes to -1 so title music can use sample 0
 	ld a, MAX_VOLUME
 	ld [wVolume], a
 	call MusicOn
@@ -62,7 +64,7 @@ MusicFadeRestart:
 	ret
 
 MusicOn:
-	ld a, 1
+	ld a, TRUE
 	ld [wMusicPlaying], a
 	ret
 
@@ -203,7 +205,7 @@ UpdateChannels:
 	call StackJumpTable
 
 .Jumptable:
-	table_width 2, UpdateChannels.Jumptable
+	table_width 2
 ; music channels
 	dw .Channel1
 	dw .Channel2
@@ -516,7 +518,7 @@ FadeMusic:
 	ld [wVolume], a
 	; did we just get on a bike?
 	ld a, [wPlayerState]
-	cp $1 ; bicycle
+	dec a ; bicycle = 1
 	jr z, .bicycle
 	push bc
 	; restart sound
@@ -1229,7 +1231,7 @@ GetNoiseSample:
 
 MusicCommands:
 ; entries correspond to audio constants (see macros/scripts/audio.asm)
-	table_width 2, MusicCommands
+	table_width 2
 	dw Music_Octave8 ; octave 8
 	dw Music_Octave7 ; octave 7
 	dw Music_Octave6 ; octave 6
@@ -2092,7 +2094,7 @@ _PlayMusic::
 	ld [wMusicNoiseSampleSet], a
 	jmp MusicOn
 
-_PlayCryHeader::
+_PlayCry::
 ; Play cry de using parameters:
 ;	wCryPitch
 ;	wCryLength
@@ -2388,7 +2390,7 @@ MonoOrStereoTracks:
 	db $11, $22, $44, $88
 
 ChannelPointers:
-	table_width 2, ChannelPointers
+	table_width 2
 ; music channels
 	dw wChannel1
 	dw wChannel2

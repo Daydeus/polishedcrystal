@@ -1,6 +1,6 @@
 MoveEffectsPointers:
 ; entries correspond to EFFECT_* constants
-	table_width 2, MoveEffectsPointers
+	table_width 2
 	dw NormalHit
 	dw NormalHit
 	dw NormalHit
@@ -128,7 +128,6 @@ MoveEffectsPointers:
 	dw RainDance
 	dw SunnyDay
 	dw BellyDrum
-	dw MirrorCoat
 	dw Earthquake
 	dw FutureSight
 	dw Gust

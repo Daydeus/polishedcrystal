@@ -114,7 +114,7 @@ wCurMove::
 wCreditsSpawn::
 	db
 
-wNamedObjectTypeBuffer:: db
+wTimeSinceText:: db
 
 wCurOptionsPage:: db
 
@@ -381,10 +381,9 @@ wTypeModifier::
 ; bit 7: stab
 	db
 
-wCriticalHit::
-; 0 if not critical
-; 1 for a critical hit
-; 2 for a OHKO
+wMoveHitState::
+; bit 0: move was a critical hit
+; bit 1: move hit a substitute
 	db
 
 wAttackMissed::
@@ -663,7 +662,7 @@ wEnemyCharging:: db
 
 wGivingExperienceToExpShareHolders:: db
 
-wAnimationsDisabled:: db ; used to temporarily disable animations for abilities
+wInAbility:: db ; disables animations for abilities among other things
 
 wBattleEnded:: db
 
@@ -786,7 +785,9 @@ wNamingScreenKeyboardWidth:: db
 
 SECTION UNION "Misc 404", WRAM0
 ; pokegear
-	ds 172
+	ds 132
+
+wRadioCompressedText:: ds 2 * SCREEN_WIDTH
 
 wPokegearPhoneLoadNameBuffer:: db
 wPokegearPhoneCursorPosition:: db
@@ -901,14 +902,12 @@ SECTION UNION "Misc 1326", WRAM0
 wInverIndexes:: ds NUM_INVER_MONS
 
 wInverGroup::
-	ds 7 ; db "Inver@"
-	db ; TRAINERTYPE_ITEM | TRAINERTYPE_DVS | TRAINERTYPE_PERSONALITY | TRAINERTYPE_MOVES
+	ds 8 ; length + "Inver@" + flags
 	rept PARTY_LENGTH
 		ds 3 ; dbp <level>, <species>, <form>
 		ds 5 ; db <item>, <dv1>, <dv2>, <dv3>, <nat | abil>
 		ds NUM_MOVES ; moves
 	endr
-	db ; db -1 ; end
 
 
 SECTION UNION "Misc 1326", WRAM0
@@ -981,6 +980,25 @@ wBillsPC_QuickFrames:: db
 
 wBillsPC_ApplyThemePals:: db ; used by _CGB_BillsPC
 
+wSummaryScreenPals:: ds 8 palettes
+
+wSummaryScreenOAM::
+for n, NUM_SPRITE_OAM_STRUCTS
+wSummaryScreenOAMSprite{02d:n}:: sprite_oam_struct wSummaryScreenOAMSprite{02d:n}
+endr
+wSummaryScreenTypes:: ds 6
+wSummaryScreenStep:: db
+wSummaryScreenInterrupts:: ds 2 * 16
+wSummaryScreenPage:: db
+wSummaryScreenMoveCount:: db
+wSummaryMoveSwap:: db
+
+; Used to align window buffer for DMA copying
+; Feel free to use or move data, an assert will fail if the memory becomes misaligned
+ds 13
+assert @ % 16 == 0
+
+wSummaryScreenWindowBuffer:: ds 32 * 10
 
 SECTION UNION "Misc 1326", WRAM0
 ; raw link data
@@ -1049,6 +1067,44 @@ wLinkReceivedMail:: ds MAIL_STRUCT_LENGTH * PARTY_LENGTH
 wLinkReceivedMailEnd:: db
 
 
+SECTION UNION "Misc 1326", WRAM0
+
+; GB Printer data
+wGameboyPrinterRAM::
+wGameboyPrinter2bppSource:: ds 40 tiles
+wGameboyPrinter2bppSourceEnd::
+wPrinterRowIndex:: db
+
+; Printer data
+wPrinterData:: ds 4
+wPrinterChecksum:: dw
+wPrinterHandshake:: db
+wPrinterStatusFlags::
+; bit 7: set if error 1 (battery low)
+; bit 6: set if error 4 (too hot or cold)
+; bit 5: set if error 3 (paper jammed or empty)
+; if this and the previous byte are both $ff: error 2 (connection error)
+	db
+
+wHandshakeFrameDelay:: db
+wPrinterSerialFrameDelay:: db
+wPrinterSendByteOffset:: dw
+wPrinterSendByteCounter:: dw
+
+; tilemap backup?
+wPrinterTilemapBuffer:: ds SCREEN_HEIGHT * SCREEN_WIDTH
+wPrinterStatus:: db
+	ds 1
+; High nibble is for margin before the image, low nibble is for after.
+wPrinterMargins:: db
+wPrinterExposureTime:: db
+	ds 16
+wGameboyPrinterRAMEnd::
+
+wPrinterOpcode:: db
+wPrinterConnectionOpen:: db
+
+
 SECTION "Video", WRAM0
 
 wBGMapBuffer:: ds 48
@@ -1068,6 +1124,7 @@ wMemCGBLayout:: db
 UNION
 wCreditsPos:: dw
 wCreditsTimer:: db
+NEXTU
 wTrainerCardBadgePaletteAddr:: dw
 NEXTU
 wPlayerHPPal:: db
@@ -1164,8 +1221,8 @@ wBattleTransitionSineWaveOffset::
 wBattleTransitionSpinQuadrant:: db
 
 NEXTU
-; stats screen
-wStatsScreenFlags:: db
+; summary screen
+wSummaryScreenFlags:: db
 
 NEXTU
 ; miscellaneous
@@ -1177,6 +1234,7 @@ wTradeDialog::
 wRandomValue::
 wEchoRAMTest::
 	db
+wPrinterQueueLength::
 wFrameCounter2:: db
 wUnusedTradeAnimPlayEvolutionMusic:: db
 
@@ -1385,15 +1443,16 @@ wInitialOptions::
 ; bit 3: perfect IVs off/on
 ; bit 4: traded behavior off/on
 ; bit 5: affection bonuses off/on
-; bit 6: scaled exp on/off
+; bit 6: scaled exp on/off (cannot be set together with no exp)
 ; bit 7: physical-special split on/off
 	db
 
 wInitialOptions2::
-; bit 0: EVs disabled
-; bit 1: classic EVs (no 510 cap)
-; bit 2: modern EVs (510 cap)
-; (only one of bits 0-2 can be set)
+; bits 0-1: EVs (cannot be set to %11)
+; - %00: EVs disabled
+; - %01: classic EVs (no 510 cap)
+; - %10: modern EVs (510 cap)
+; bit 2: no exp on/off (cannot be set together with scaled exp)
 ; bit 3: use RTC
 ; bit 4: evolve in battle
 ; bits 5-6: unused
@@ -1409,6 +1468,13 @@ wDaysSince:: db
 
 ; Temporary backup for options
 wOptionsBuffer:: db
+
+SECTION "SRAM Access Count", WRAM0
+
+; Contains a count of the number of times SRAM has been opened in a
+; session. Protects against bugs from emulators that do not load SRAM
+; when loading a savestate.
+wSRAMAccessCount:: db
 
 SECTION "Rom Checksum", WRAM0
 

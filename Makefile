@@ -1,13 +1,13 @@
 NAME := polishedcrystal
 MODIFIERS :=
-VERSION := 3.0.0-beta
+VERSION := 3.2.0
 
 ROM_NAME = $(NAME)$(MODIFIERS)-$(VERSION)
 EXTENSION := gbc
 
 TITLE := PKPCRYSTAL
 MCODE := PKPC
-ROMVERSION := 0x30
+ROMVERSION := 0x32
 
 FILLER := 0xff
 
@@ -21,11 +21,11 @@ Q :=
 
 .SECONDEXPANSION:
 
-RGBASM_FLAGS     = -E -Q8 -P includes.asm -Weverything -Wnumeric-string=2 -Wtruncation=1
+RGBASM_FLAGS     = -E -Q8 -P includes.asm -Weverything -Wtruncation=1
 RGBASM_VC_FLAGS  = $(RGBASM_FLAGS) -DVIRTUAL_CONSOLE
 RGBLINK_FLAGS    = -M -n $(ROM_NAME).sym    -m $(ROM_NAME).map    -p $(FILLER)
 RGBLINK_VC_FLAGS = -M -n $(ROM_NAME)_vc.sym -m $(ROM_NAME)_vc.map -p $(FILLER)
-RGBFIX_FLAGS     = -csjv -t $(TITLE) -i $(MCODE) -n $(ROMVERSION) -p $(FILLER) -k 01 -l 0x33 -m 0x10 -r 3
+RGBFIX_FLAGS     = -csjv -t $(TITLE) -i $(MCODE) -n $(ROMVERSION) -p $(FILLER) -k 01 -l 0x33 -m MBC3+TIMER+RAM+BATTERY -r 3
 
 ifeq ($(filter faithful,$(MAKECMDGOALS)),faithful)
 MODIFIERS := $(MODIFIERS)-faithful
@@ -52,7 +52,7 @@ MODIFIERS :=
 NAME := pkpc
 EXTENSION := pocket
 RGBASM_FLAGS += -DANALOGUE_POCKET -DNO_RTC
-RGBFIX_FLAGS = -csj -f hg -t $(TITLE) -i $(MCODE) -n $(ROMVERSION) -p $(FILLER) -k 01 -l 0x33 -m 0x1b -r 3
+RGBFIX_FLAGS = -csj -f hg -t $(TITLE) -i $(MCODE) -n $(ROMVERSION) -p $(FILLER) -k 01 -l 0x33 -m MBC5+RAM+BATTERY -r 3
 endif
 ifeq ($(filter huffman,$(MAKECMDGOALS)),huffman)
 Q := @
@@ -167,6 +167,7 @@ $(ROM_NAME)_vc.gbc: $(crystal_vc_obj) layout.link
 gfx/battle/lyra_back.2bpp: rgbgfx += -Z
 gfx/battle/substitute-back.2bpp: rgbgfx += -Z
 gfx/battle/substitute-front.2bpp: rgbgfx += -Z
+gfx/battle/ghost.2bpp: rgbgfx += -Z
 
 gfx/battle_anims/angels.2bpp: tools/gfx += --trim-whitespace
 gfx/battle_anims/beam.2bpp: tools/gfx += --remove-xflip --remove-yflip --remove-whitespace
@@ -230,7 +231,6 @@ gfx/slots/slots_2.2bpp: tools/gfx += --interleave --png=$<
 gfx/slots/slots_3.2bpp: tools/gfx += --interleave --png=$< --remove-duplicates --keep-whitespace --remove-xflip
 
 gfx/stats/judge.2bpp: tools/gfx += --trim-whitespace
-gfx/stats/stats_balls.2bpp: gfx/stats/stats.2bpp gfx/stats/balls.2bpp ; $Qcat $^ > $@
 
 gfx/title/crystal.2bpp: tools/gfx += --interleave --png=$<
 gfx/title/logo_version.2bpp: gfx/title/logo.2bpp gfx/title/version.2bpp ; $Qcat $^ > $@

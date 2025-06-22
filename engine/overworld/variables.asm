@@ -5,7 +5,7 @@ VarActionTable:
 ; words c000-ffff (WRAM/HRAM labels) are returned directly
 ; words 8000-bfff (shifted RAM labels) are shifted to c000-ffff and read into wStringBuffer2
 ; this means that vars cannot execute RAM code, nor return pointers to or values from ROM or VRAM/SRAM
-	table_width 2, VarActionTable
+	table_width 2
 	dw wStringBuffer2 in_stringbuffer2
 	dw wPartyCount in_stringbuffer2
 	dw Var_BattleResult ; execute
@@ -135,6 +135,7 @@ Var_CountTrainerStars:
 	; star for completing the Pokédex
 	push bc
 	farcall Pokedex_CountSeenOwn
+	pop bc
 	ld hl, wTempDexOwn
 	ld a, [hli]
 	cp HIGH(NUM_POKEMON)
@@ -144,7 +145,6 @@ Var_CountTrainerStars:
 	jr c, .nostar3
 	inc b
 .nostar3
-	pop bc
 	; star for beating Tower Tycoon Palmer or Factory Head Thorton
 	eventflagcheck EVENT_BEAT_PALMER
 	jr nz, .star4

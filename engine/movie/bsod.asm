@@ -114,7 +114,7 @@ VBABSODMessage:
 	done
 
 BSODErrorStrings:
-	table_width 1, BSODErrorStrings
+	table_width 1
 	dr .Rst0             ; ERR_RST_0
 	dr .DivZero          ; ERR_DIV_ZERO
 	dr .EggSpecies       ; ERR_EGG_SPECIES
@@ -126,6 +126,7 @@ BSODErrorStrings:
 	dr .OldBox           ; ERR_OLDBOX
 	dr .NewBox           ; ERR_NEWBOX
 	dr .WinStackOverflow ; ERR_WINSTACK_OVERFLOW
+	dr .CorruptSavestate ; ERR_CORRUPT_SAVESTATE
 	dr .UnknownError     ; unknown
 	assert_table_length NUM_ERR_CODES + 1
 
@@ -140,4 +141,5 @@ BSODErrorStrings:
 .OldBox:           text "Old PC Box storage@"
 .NewBox:           text "Fatal PC Box error@"
 .WinStackOverflow: text "Win.stack overflow@"
+.CorruptSavestate: text "Corrupt savestate@"
 .UnknownError:     text "Unknown error@"

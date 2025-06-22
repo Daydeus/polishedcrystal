@@ -14,8 +14,8 @@ CinnabarVolcanoB2F_MapScriptHeader:
 	def_bg_events
 
 	def_object_events
-	object_event 18, 22, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, MOLTRES, -1, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, PLAIN_FORM, CinnabarVolcanoMoltres, EVENT_CINNABAR_VOLCANO_MOLTRES
-	object_event 12, 24, SPRITE_LAWRENCE, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_LAWRENCE_FINAL_BIRD
+	object_event 18, 22, SPRITE_MON_ICON, SPRITEMOVEDATA_POKEMON, 0, MOLTRES, -1, PAL_NPC_RED, OBJECTTYPE_SCRIPT, PLAIN_FORM, CinnabarVolcanoMoltres, EVENT_CINNABAR_VOLCANO_MOLTRES
+	object_event 12, 24, SPRITE_LAWRENCE, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, 0, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_LAWRENCE_FINAL_BIRD
 	smashrock_event 21, 19
 	itemball_event 18,  3, FLAME_ORB, 1, EVENT_CINNABAR_VOLCANO_B2F_FLAME_ORB
 
@@ -94,11 +94,9 @@ CinnabarVolcanoMoltres:
 	setevent EVENT_CINNABAR_VOLCANO_MOLTRES
 	reloadmapafterbattle
 	special CheckBattleCaughtResult
-	iffalsefwd .NoCandela
+	iffalsefwd .NoCatch
 	setflag ENGINE_PLAYER_CAUGHT_MOLTRES
-	setevent EVENT_CELADON_UNIVERSITY_CANDELA
-	clearevent EVENT_SHAMOUTI_COAST_CANDELA
-.NoCandela
+.NoCatch
 	checkevent EVENT_SEAFOAM_ISLANDS_ARTICUNO
 	iffalsefwd .end
 	checkevent EVENT_ROUTE_10_ZAPDOS

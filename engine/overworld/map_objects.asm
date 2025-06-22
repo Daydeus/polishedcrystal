@@ -39,7 +39,7 @@ HandleObjectStep:
 	jmp nz, SetFacingStanding
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
-	bit OBJ_FLAGS2_6, [hl]
+	bit OFF_SCREEN_F, [hl]
 	jmp nz, SetFacingStanding
 	bit FROZEN_F, [hl]
 	jr nz, HandleObjectAction
@@ -69,7 +69,7 @@ INCLUDE "engine/overworld/map_object_action.asm"
 _CheckObjectStillVisible:
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
-	res OBJ_FLAGS2_6, [hl]
+	res OFF_SCREEN_F, [hl]
 	ldh a, [hMapObjectIndexBuffer]
 	and a
 	jr nz, .notPlayer
@@ -178,9 +178,9 @@ _HandleStepType:
 .do_step_type
 	call StackJumpTable
 
-StepTypesJumptable:
+.StepTypesJumptable:
 ; entries correspond to STEP_TYPE_* constants (see constants/map_object_constants.asm)
-	table_width 2, StepTypesJumptable
+	table_width 2
 	dw StepFunction_Reset           ; STEP_TYPE_RESET
 	dw StepFunction_FromMovement    ; STEP_TYPE_FROM_MOVEMENT
 	dw StepFunction_NPCWalk         ; STEP_TYPE_NPC_WALK
@@ -545,7 +545,7 @@ endr
 
 .Pointers:
 ; entries correspond to SPRITEMOVEFN_* constants (see constants/map_object_constants.asm)
-	table_width 2, StepFunction_FromMovement.Pointers
+	table_width 2
 	dw DoNothing                     ; SPRITEMOVEFN_00
 	dw .RandomWalkY                  ; SPRITEMOVEFN_RANDOM_WALK_Y
 	dw .RandomWalkX                  ; SPRITEMOVEFN_RANDOM_WALK_X
@@ -661,8 +661,8 @@ endr
 	jr z, .on_pit
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
-	bit OBJ_FLAGS2_2, [hl]
-	res OBJ_FLAGS2_2, [hl]
+	bit BOULDER_MOVING_F, [hl]
+	res BOULDER_MOVING_F, [hl]
 	jr z, .ok
 	ld hl, OBJECT_RANGE
 	add hl, bc
@@ -1360,6 +1360,9 @@ StepFunction_Skyfall:
 	ld hl, OBJECT_STEP_DURATION
 	add hl, bc
 	ld [hl], 16
+	ld hl, OBJECT_FLAGS2
+	add hl, bc
+	set HIGH_PRIORITY_F, [hl]
 	call IncrementObjectStructField1c
 .Step:
 	ld hl, OBJECT_STEP_DURATION
@@ -1403,6 +1406,9 @@ StepFunction_Skyfall:
 	ld hl, OBJECT_SPRITE_Y_OFFSET
 	add hl, bc
 	ld [hl], 0
+	ld hl, OBJECT_FLAGS2
+	add hl, bc
+	res HIGH_PRIORITY_F, [hl]
 	ld hl, OBJECT_STEP_TYPE
 	add hl, bc
 	ld [hl], STEP_TYPE_FROM_MOVEMENT
@@ -1640,7 +1646,7 @@ StepFunction_StrengthBoulder:
 	pop bc
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
-	res OBJ_FLAGS2_2, [hl]
+	res BOULDER_MOVING_F, [hl]
 	call CopyNextCoordsTileToStandingCoordsTile
 	ld hl, OBJECT_WALKING
 	add hl, bc
@@ -1895,14 +1901,6 @@ GetMovementByte:
 	ld hl, wMovementDataPointer
 	jmp _GetMovementByte
 
-GetMovementObject:
-	ld a, [wMovementObject]
-	ret
-
-_GetMovementObject:
-	ld hl, GetMovementObject
-	; fallthrough
-
 HandleMovementData:
 	call .StorePointer
 .loop
@@ -1930,12 +1928,6 @@ ContinueReadingMovement:
 	ld a, 1
 	ld [wMovementByteWasControlSwitch], a
 	ret
-
-DoMovementFunction:
-	push af
-	call ApplyMovementToFollower
-	pop af
-	call StackJumpTable
 
 INCLUDE "engine/overworld/movement.asm"
 
@@ -2879,7 +2871,7 @@ InitSprites:
 	ld hl, OBJECT_FLAGS2
 	add hl, bc
 	ld e, [hl]
-	bit OBJ_FLAGS2_7, e
+	bit OBJ_FLAGS2_7_F, e
 	jr z, .skip2
 	or PRIORITY
 .skip2

@@ -60,7 +60,7 @@ DoOverworldWeather:
 	jmp PopBCDEHL
 
 .DoWeather_Jumptable:
-	table_width 2, .DoWeather_Jumptable
+	table_width 2
 	dw DoNothing
 	dw DoOverworldRain
 	dw DoOverworldSnow
@@ -73,7 +73,7 @@ DoOverworldWeather:
 	call StackJumpTable
 
 .Cooldown_Jumptable:
-	table_width 2, .Cooldown_Jumptable
+	table_width 2
 	dw .cooldown_cleanup
 	dw .rain_cooldown
 	dw .snow_cooldown
@@ -929,7 +929,7 @@ LoadWeatherGraphics:
 	dec a
 	jr z, .rain
 	assert OW_WEATHER_SANDSTORM == 4
-; standstorm
+; sandstorm
 	lb bc, BANK(SandGFX), 1
 	ld de, SandGFX
 	jr .continue
@@ -945,7 +945,6 @@ LoadWeatherGraphics:
 	jmp Get2bpp
 
 
-RainGFX:   INCBIN "gfx/overworld/rain.2bpp"
-SplashGFX: INCBIN "gfx/overworld/rain_splash.2bpp"
-SnowGFX:   INCBIN "gfx/overworld/snow.2bpp"
-SandGFX:   INCBIN "gfx/overworld/sand.2bpp"
+RainGFX: INCBIN "gfx/overworld/rain_splash.2bpp"
+SnowGFX: INCBIN "gfx/overworld/snow.2bpp"
+SandGFX: INCBIN "gfx/overworld/sand.2bpp"

@@ -264,7 +264,7 @@ RunBattleAnimCommand:
 
 BattleAnimCommands::
 ; entries correspond to anim_* constants (see macros/scripts/battle_anims.asm)
-	table_width 2, BattleAnimCommands
+	table_width 2
 	dw BattleAnimCmd_StatLoop
 	dw BattleAnimCmd_Obj
 	dw BattleAnimCmd_1GFX
@@ -970,7 +970,7 @@ SetBattleAnimPal:
 	jr .done_setpal
 
 CustomBattlePalettes:
-	table_width 1 palettes, CustomBattlePalettes
+	table_width 1 palettes
 INCLUDE "gfx/battle_anims/custom.pal"
 	assert_table_length NUM_CUSTOM_BATTLE_PALETTES
 
@@ -982,20 +982,17 @@ BattleAnimCmd_RaiseSub:
 	xor a
 	call GetSRAMBank
 
-GetSubstitutePic:
+	ld hl, SubstituteBackpic
+	lb bc, BANK(SubstituteBackpic), 6 * 6
+	ld de, vTiles2 tile $31
+
 	ldh a, [hBattleTurn]
 	and a
-	jr z, .player
+	jr z, .done
 
 	ld hl, SubstituteFrontpic
 	lb bc, BANK(SubstituteFrontpic), 7 * 7
 	ld de, vTiles2 tile $00
-	jr .done
-
-.player
-	ld hl, SubstituteBackpic
-	lb bc, BANK(SubstituteBackpic), 6 * 6
-	ld de, vTiles2 tile $31
 
 .done
 	call DecompressRequest2bpp
@@ -1155,7 +1152,7 @@ endr
 
 .done_cry_tracks
 	push hl
-	call LoadCryHeader
+	call LoadCry
 	pop hl
 	jr c, .done
 
@@ -1192,7 +1189,7 @@ endr
 	ld a, 1
 	ld [wStereoPanningMask], a
 
-	farcall _PlayCryHeader
+	farcall _PlayCry
 
 .done
 	pop af

@@ -44,11 +44,30 @@ NewGame_ClearTileMapEtc:
 	jmp ClearWindowData
 
 NewGamePlus:
+	ld hl, .text
+	call PrintText
+	call YesNoBox
+	jr c, _MainMenu
 	xor a
 	ldh [hBGMapMode], a
 	farcall TryLoadSaveFile
 	ret c
 	jr _NewGame_FinishSetup
+
+.text
+	text "New Game+ will"
+	line "keep your previous"
+
+	para "game's money,"
+	line "Battle Points, and"
+
+	para "any #mon stored"
+	line "in the PC!"
+
+	para "Are you sure you"
+	line "you want to start"
+	cont "New Game+?"
+	done
 
 NewGame:
 	xor a
@@ -105,8 +124,12 @@ ResetWRAM_NotPlus:
 
 ResetWRAM:
 	ld hl, wShadowOAM
-	ld bc, wOptions3 - wShadowOAM
+	ld bc, wMusic - wShadowOAM
 	xor a
+	rst ByteFill
+
+	ld hl, wMusicEnd
+	ld bc, wOptions3 - wMusicEnd
 	rst ByteFill
 
 	ld hl, wRAM1Start
@@ -248,9 +271,9 @@ _ResetWRAM_InitList:
 
 InitializeMagikarpHouse:
 	ld hl, wBestMagikarpLengthMmHi
-	ld a, $3
+	ld a, HIGH(BEST_MAGIKARP_LENGTH)
 	ld [hli], a
-	ld a, $6
+	ld a, LOW(BEST_MAGIKARP_LENGTH)
 	ld [hli], a
 	ld de, .Ralph
 	jmp CopyName2
@@ -676,12 +699,8 @@ ElmText1:
 ElmText2:
 	text_far _ElmText2
 	text_asm
-	xor a
-	ld [wStereoPanningMask], a
-	ld [wCryTracks], a
-	ld de, GLACEON - 1
-	call PlayCryHeader
-	call WaitSFX
+	lp bc, GLACEON
+	call PlayMonCry
 	ld hl, ElmText3
 	ret
 
@@ -1381,13 +1400,15 @@ Copyright:
 
 CopyrightString:
 	; ©1995-2001 Nintendo
-	db   $60, $61, $62, $63, $64, $65, $66
-	db   $67, $68, $69, $6a, $6b, $6c
+	db $60, $61, $62, $63, $64, $65, $66
+	db $67, $68, $69, $6a, $6b, $6c
 
 	; ©1995-2001 Creatures inc.
-	next $60, $61, $62, $63, $64, $65, $66
-	db   $6d, $6e, $6f, $70, $71, $72, $7a, $7b, $7c
+	db "<NEXT>"
+	db $60, $61, $62, $63, $64, $65, $66
+	db $6d, $6e, $6f, $70, $71, $72, $7a, $7b, $7c
 
 	; ©1995-2001 GAME FREAK inc.
-	next $60, $61, $62, $63, $64, $65, $66
-	db   $73, $74, $75, $76, $77, $78, $79, $7a, $7b, $7c, "@"
+	db "<NEXT>"
+	db $60, $61, $62, $63, $64, $65, $66
+	db $73, $74, $75, $76, $77, $78, $79, $7a, $7b, $7c, "@"

@@ -1,8 +1,10 @@
+; If you change the item names, also update PluralTable (see data/text/plural_table.asm)
+
 	; use rawchars so VWF will work in the PC
 	setcharmap no_ngrams
 
 ItemNames::
-	list_start ItemNames
+	list_start
 	li "Park Ball"
 
 	li "Poké Ball"
@@ -277,7 +279,7 @@ endc
 	li "Power Anklet"
 
 	li "Dragon Scale"
-	li "Up-Grade"
+	li "Upgrade"
 	li "Dubious Disc"
 	li "Protector"
 	li "Electirizer"

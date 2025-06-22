@@ -122,6 +122,7 @@ SpecialsPointers::
 	add_special LoadMapPalettes
 	add_special Special_InitialSetDSTFlag
 	add_special Special_InitialClearDSTFlag
+	add_special LoadFonts_NoOAMUpdate
 
 ; Battle Tower
 	add_special Special_BattleTower_Battle
@@ -172,3 +173,4 @@ SpecialsPointers::
 	add_special ShowTMHMIcon
 	add_special FixPlayerEVsAndStats
 	add_special FadeInPalettes_EnableDynNoApply
+	add_special PrintDiploma

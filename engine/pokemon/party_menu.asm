@@ -120,6 +120,8 @@ BT_SwapRentals:
 .reset_switch
 	xor a
 	ld [wSwitchMon], a
+	call LoadPartyMenuGFX
+	call SetDefaultBGPAndOBP
 	jmp .loop
 
 .improper_swap
@@ -212,9 +214,7 @@ BT_PartySelect:
 	dec a ; Enter
 	jr z, .Enter
 	dec a ; Stats
-	jmp z, .Stats
-	dec a ; Moves
-	jmp z, .Moves
+	jr z, .Stats
 	jr .loop ; Cancel
 
 .return
@@ -226,7 +226,7 @@ BT_PartySelect:
 	ld a, MON_IS_EGG
 	call GetPartyParamLocationAndValue
 	bit MON_IS_EGG_F, a
-	ld hl, .EggMenuHeader
+	ld hl, .BannedMenuHeader
 	jmp nz, BT_DisplayMenu
 
 	; Check if mon is banned
@@ -281,57 +281,35 @@ BT_PartySelect:
 	prompt
 
 .Stats:
-	farcall OpenPartyStats
+	farcall OpenPartySummary
 	jmp .loop
-
-.Moves:
-	; For Eggs, "Moves" is actually the "Cancel" option
-	ld a, MON_IS_EGG
-	call GetPartyParamLocationAndValue
-	bit MON_IS_EGG_F, a
-	jr nz, .Cancel
-	farcall ManagePokemonMoves
 
 .Cancel:
 	jmp .loop
 
-.EggMenuHeader:
-	db $00 ; flags
-	menu_coords 11, 13, 19, 17
-	dw .EggMenuData
-	db 1 ; default option
-
-.EggMenuData:
-	db $c0 ; flags
-	db 2 ; items
-	db "Stats@"
-	db "Cancel@"
-
 .MenuHeader:
 	db $00 ; flags
-	menu_coords 11, 9, 19, 17
+	menu_coords 10, 11, 19, 17
 	dw .MenuData
 	db 1 ; default option
 
 .MenuData:
 	db $c0 ; flags
-	db 4 ; items
+	db 3 ; items
 	db "Enter@"
-	db "Stats@"
-	db "Moves@"
+	db "Summary@"
 	db "Cancel@"
 
 .BannedMenuHeader:
 	db $00 ; flags
-	menu_coords 11, 11, 19, 17
+	menu_coords 10, 13, 19, 17
 	dw .BannedMenuData
 	db 1 ; default option
 
 .BannedMenuData:
 	db $c0 ; flags
-	db 3 ; items
-	db "Stats@"
-	db "Moves@"
+	db 2 ; items
+	db "Summary@"
 	db "Cancel@"
 
 BTText_EnterBattle:
@@ -349,6 +327,8 @@ BTText_SameItem:
 	prompt
 
 BT_ConfirmPartySelection:
+	call LoadPartyMenuGFX
+	call SetDefaultBGPAndOBP
 	call InitPartyMenuLayout
 	farcall FreezeMonIcons
 	hlcoord 1, 16
@@ -633,8 +613,7 @@ PlacePartyHPBar:
 	ld b, $0
 	add hl, bc
 	call SetHPPal
-	ld a, CGB_PARTY_MENU_HP_PALS
-	call GetCGBLayout
+	farcall ApplyPartyMenuHPPals
 .skip
 	ld hl, wHPPalIndex
 	inc [hl]
@@ -793,6 +772,8 @@ PlacePartyMonTMHMCompatibility:
 	ret z
 	ld c, a
 	ld b, 0
+	xor a
+	ld [wCurPartyMon], a
 	hlcoord 12, 2
 .loop
 	push bc
@@ -803,6 +784,23 @@ PlacePartyMonTMHMCompatibility:
 	ld hl, wPartyMon1Species
 	ld a, b
 	call GetPartyLocation
+
+	; check if move is already known
+	push hl
+	ld a, MON_MOVES
+	call GetPartyParamLocationAndValue
+	ld a, [wPutativeTMHMMove]
+	ld b, a
+	ld c, NUM_MOVES
+.knows_move_loop
+	ld a, [hli]
+	cp b
+	jr z, .already_known
+	dec c
+	jr nz, .knows_move_loop
+	pop hl
+
+	; check if move is learnable if not already known
 	ld a, [hl]
 	ld [wCurPartySpecies], a
 	ld bc, MON_FORM - MON_SPECIES
@@ -816,6 +814,8 @@ PlacePartyMonTMHMCompatibility:
 	rst PlaceString
 
 .next
+	ld hl, wCurPartyMon
+	inc [hl]
 	pop hl
 	ld de, SCREEN_WIDTH * 2
 	add hl, de
@@ -825,10 +825,20 @@ PlacePartyMonTMHMCompatibility:
 	jr nz, .loop
 	ret
 
+.already_known:
+	pop hl
+	pop hl
+
+	ld de, .string_learned
+	rst PlaceString
+	jr .next
+
 .PlaceAbleNotAble:
 	ld a, c
 	and a
 	jr nz, .able
+
+.not_able
 	ld de, .string_not_able
 	ret
 
@@ -841,6 +851,9 @@ PlacePartyMonTMHMCompatibility:
 
 .string_not_able
 	db "Not able@"
+
+.string_learned
+	db "Learned@"
 
 PlacePartyMonEvoStoneCompatibility:
 	ld a, [wPartyCount]
@@ -886,10 +899,16 @@ PlacePartyMonEvoStoneCompatibility:
 	ld b, a
 	ld de, .string_not_able
 .loop2
+	ld a, b
+	cp LINKING_CORD
+	ld c, EVOLVE_TRADE + 1 ; due to "inc a"
+	jr z, .got_evolve_type
+	ld c, EVOLVE_ITEM + 1
+.got_evolve_type
 	ld a, [hli]
-	cp -1
+	inc a
 	jr z, .done
-	cp EVOLVE_ITEM
+	cp c
 	ld a, [hli]
 	inc hl
 	inc hl
@@ -1194,7 +1213,7 @@ PartyMenuAttributes:
 	db 0
 
 PartyMenuSelect:
-; sets carry if exitted menu.
+; sets carry if exited menu.
 	call DoMenuJoypadLoop
 	call PlaceHollowCursor
 	ld a, [wPartyCount]
@@ -1220,22 +1239,21 @@ PartyMenuSelect:
 	add hl, bc
 	ld a, [hl]
 	ld [wCurForm], a
-
-	ld de, SFX_READ_TEXT_2
-	call PlaySFX
-	push bc
-	call SFXDelay2
-	pop bc
+	call .sfx_delay_2
 	and a
 	ret
 
 .exitmenu
+	call .sfx_delay_2
+	scf
+	ret
+
+.sfx_delay_2
 	ld de, SFX_READ_TEXT_2
 	call PlaySFX
 	push bc
 	call SFXDelay2
 	pop bc
-	scf
 	ret
 
 PlacePartyMenuText:
