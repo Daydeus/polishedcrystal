@@ -162,6 +162,7 @@ DoMove:
 .endturn_herb
 	push af
 	call CheckEndMoveEffects
+	call CheckThroatSpray
 	call CheckPowerHerb
 	pop af
 	ret
@@ -198,7 +199,7 @@ BattleCommand_checkturn:
 	ld [wAlreadyDisobeyed], a
 	ld [wAlreadyExecuted], a
 
-	ld a, $10 ; 1.0
+	ld a, EFFECTIVE
 	ld [wTypeModifier], a
 
 	ld a, BATTLE_VARS_SUBSTATUS3
@@ -1375,6 +1376,74 @@ ENDM
 	species_battle_item THICK_CLUB, MAROWAK
 	db -1
 
+OpponentCanLoseItem:
+	call StackCallOpponentTurn
+UserCanLoseItem:
+; Returns z if the item is considered "essential". This applies if:
+; - user doesn't have a held item
+; - user is holding Mail
+; - form-changing items and EITHER user or target is the species
+; Performs no other item loss-related checks, this function exists
+; to ban certain items from being lost/gained.
+; Note that form-changing items are covered even if the item applies
+; to the user's mon but the item is on the foe. This is for Trick, but
+; will also prevent Mewtwo from Knocking Off a non-Mewtwo's Armor Suit.
+; This is consistent with vanilla behaviour of these kinds of items.
+	push hl
+	push de
+	push bc
+	call GetUserItem
+	ld a, [hl]
+	and a
+	jr z, .match
+	ld d, a
+	call ItemIsMail
+	jr c, .match
+	ld hl, .EssentialItemTable - 1
+.loop
+	inc hl
+	ld a, [hli]
+	cp 1 ; no-optimize a == 1 (dec a can't set carry)
+	jr c, .done
+	cp d
+	ld a, [hli]
+	jr nz, .loop
+
+	; Found essential item. Check if user or opponent's species matches.
+	ld c, a
+	ld b, [hl]
+
+	call .CompareUserSpecies
+	jr z, .match
+	call SwitchTurn
+	call .CompareUserSpecies
+	call SwitchTurn
+	jr nz, .loop
+
+.match
+	xor a
+.done
+	jmp PopBCDEHL
+
+.CompareUserSpecies:
+	push hl
+	ld a, MON_SPECIES
+	call UserPartyAttr
+	cp c
+	pop hl
+	ret nz
+	push hl
+	ld a, MON_FORM
+	call UserPartyAttr
+	pop hl
+	ld b, a
+	ld a, [hl]
+	jmp CompareSpeciesForm
+
+.EssentialItemTable:
+	species_battle_item ARMOR_SUIT, MEWTWO, MEWTWO_ARMORED_FORM
+	db 0
+
 CheckAirBalloon:
 ; Returns z if the user is holding an Air Balloon
 	push bc
@@ -1684,7 +1753,7 @@ _CheckTypeMatchup:
 	ld a, [hli]
 	ld c, [hl]
 	ld b, a
-	ld a, $10 ; 1.0
+	ld a, EFFECTIVE
 	ld [wTypeMatchup], a
 	ld hl, InverseTypeMatchups
 	ld a, [wBattleType]
@@ -1804,7 +1873,7 @@ BattleCommand_resettypematchup:
 	call BattleCheckTypeMatchup
 	ld a, [wTypeMatchup]
 	and a
-	ld a, $10 ; 1.0
+	ld a, EFFECTIVE
 	jr nz, .reset
 	call ResetDamage
 	xor a
@@ -2015,6 +2084,13 @@ BattleCommand_checkhit:
 .max_acc_ok
 	add 13
 	ld b, a
+
+	call GetOpponentAbilityAfterMoldBreaker
+	cp WONDER_SKIN
+	jr nz, .not_wonder_skin
+	farcall WonderSkinAbility
+
+.not_wonder_skin
 	xor a
 	ldh [hMultiplicand + 0], a
 	ldh [hMultiplicand + 1], a
@@ -2302,11 +2378,13 @@ BattleCommand_checkpriority:
 	jmp BattleCommand_failuretext
 
 BattleCommand_effectchance:
-; Doesn't work against Substitute or Shield Dust
+; Doesn't work against Substitute or Shield Dust or fainted foes.
 	push bc
 	push hl
 	xor a
 	ld [wEffectFailed], a
+	call HasOpponentFainted
+	jr z, EffectChanceFailed
 	call CheckSubHit
 	jr nz, EffectChanceFailed
 
@@ -2952,21 +3030,29 @@ BattleCommand_supereffectivetext:
 
 .continue
 	ld a, [wTypeModifier]
-	cp $10 ; 1.0
+	cp EFFECTIVE
 	ret z
 	push af
-	ld a, [wInverseBattleScore]
-	ld hl, SuperEffectiveText
+	ld hl, wInverseBattleScore
 	jr nc, .super_effective
+	dec [hl]
+	dec [hl]
+	cp NOT_VERY_EFFECTIVE
 	ld hl, NotVeryEffectiveText
-	dec a
-	dec a
+	jr z, .got_msg
+	ld hl, MostlyIneffectiveText
+	jr .got_msg
 .super_effective
-	inc a
-	cp $80
-	jr z, .score_ok
-	ld [wInverseBattleScore], a
-.score_ok
+	inc [hl]
+	bit 7, [hl]
+	jr z, .no_inverse_overflow
+	dec [hl]
+.no_inverse_overflow
+	cp SUPER_EFFECTIVE
+	ld hl, SuperEffectiveText
+	jr z, .got_msg
+	ld hl, ExtremelyEffectiveText
+.got_msg
 	call StdBattleTextbox
 	pop af
 	ret c
@@ -2979,24 +3065,7 @@ BattleCommand_supereffectivetext:
 	call GetOpponentItemAfterUnnerve
 	ld a, b
 	cp HELD_WEAKNESS_POLICY
-	jr z, .weakness_policy
-	cp HELD_ENIGMA_BERRY
 	ret nz
-
-	push bc
-	push hl
-	farcall CheckFullHP
-	pop hl
-	pop bc
-	ret z
-
-	; treat as HP-restoring berry
-	ld b, HELD_BERRY
-	farcall _HeldHPHealingItem
-	ret nz
-	farjp UseBattleItem
-
-.weakness_policy
 	call SwitchTurn
 	ld b, 0
 	push bc
@@ -3136,14 +3205,7 @@ BattleCommand_postfainteffects:
 	ld a, BATTLE_VARS_SUBSTATUS3
 	call GetBattleVar
 	bit SUBSTATUS_IN_LOOP, a
-	jr z, .no_multi
-
-	call EndMultihit
-	call BattleCommand_supereffectivetext
-	call BattleCommand_endloop
-	call BattleCommand_raisesub
-
-.no_multi
+	call nz, EndMultihit
 	ld a, BATTLE_VARS_SUBSTATUS2_OPP
 	call GetBattleVar
 	bit SUBSTATUS_DESTINY_BOND, a
@@ -3169,25 +3231,11 @@ BattleCommand_postfainteffects:
 
 	ldh a, [hBattleTurn]
 	and a
-	jr nz, .enemy_dbond
-	call UpdateBattleMonInParty
-	jr .finish
-.enemy_dbond
-	call UpdateEnemyMonInParty
-	jr .finish
+	jmp nz, UpdateEnemyMonInParty
+	jmp UpdateBattleMonInParty
 
 .no_dbond
-	farcall RunFaintAbilities
-	call BattleCommand_posthiteffects
-
-	ld a, BATTLE_VARS_MOVE_EFFECT
-	call GetBattleVar
-	cp EFFECT_SWITCH_HIT
-	jr nz, .finish
-	call HasUserFainted
-	call nz, BattleCommand_switchout
-.finish
-	jmp EndMoveEffect
+	farjp RunFaintAbilities
 
 BattleCommand_posthiteffects:
 ; This can run even if someone is fainted. Take this into account.
@@ -3429,7 +3477,6 @@ CheckEndMoveEffects:
 	call HandleRampage
 	call CheckSheerForceNegation
 	ret z
-	call CheckThroatSpray
 
 	; Only check white herb if we didn't do damage
 	ld a, [wDamageTaken]
@@ -3669,7 +3716,6 @@ EndMoveDamageChecks:
 	call CanStealItem
 	jr nz, .no_pickpocket
 	farcall BeginAbility
-	farcall ShowAbilityActivation
 	call BattleCommand_thief
 	farcall EndAbility
 .no_pickpocket
@@ -3968,6 +4014,7 @@ GetOpponentActiveScreens:
 	; Set move anim param to notify that we are breaking screens.
 	call .GetScreen
 	ld [wBattleAnimParam], a
+.ret_z
 	xor a
 	ret
 
@@ -3977,7 +4024,7 @@ GetOpponentActiveScreens:
 	ret z
 
 	call CheckCrit
-	ret nz
+	jr nz, .ret_z
 	; fallthrough
 .GetScreen:
 	ldh a, [hBattleTurn]
@@ -4102,7 +4149,6 @@ HitSelfInConfusion:
 	ld l, a
 	call TruncateHL_BC
 	ld d, 40
-	ld e, a
 	ret
 
 ApplyAttackBoosts:
@@ -4644,7 +4690,7 @@ TakeOpponentDamage:
 	ld a, [hld]
 	ld c, a
 	ld b, [hl]
-	predef SubtractHPFromUser
+	farcall SubtractHPFromUser_SkipItems
 .did_no_damage
 	jmp RefreshBattleHuds
 
@@ -5350,7 +5396,7 @@ ENDM
 StatusProblemTable:
 	status_problem 1 << TOX, ANIM_PSN, BadlyPoisonedText ; needs to be before PSN
 	status_problem 1 << PAR, ANIM_PAR, ParalyzedText
-	status_problem 1 << FRZ, ANIM_FRZ, FrozenSolidText
+	status_problem 1 << FRZ, ANIM_FRZ, WasFrozenText
 	status_problem 1 << BRN, ANIM_BRN, WasBurnedText
 	status_problem 1 << PSN, ANIM_PSN, WasPoisonedText
 	status_problem SLP_MASK, ANIM_SLP, FellAsleepText
@@ -5794,6 +5840,8 @@ BattleCommand_charge:
 	text_end
 
 BattleCommand_traptarget:
+	call HasOpponentFainted
+	ret z
 	ld a, [wAttackMissed]
 	and a
 	ret nz
@@ -5811,16 +5859,9 @@ BattleCommand_traptarget:
 	ret nz
 	call CheckSubstituteOpp
 	ret nz
-	push bc
-	push de
-	push hl
-	call GetUserItem
-	ld a, b
-	cp HELD_PROLONG_WRAP
-	pop hl
-	pop de
-	pop bc
-	jr z, .seven_turns
+	ld a, HELD_PROLONG_WRAP
+	call GetItemBoostedDuration
+	jr z, .got_count
 	call BattleRandom
 	and 1
 	add 4
@@ -6145,17 +6186,19 @@ ResetActorDisable:
 	ret
 
 GetItemBoostedDuration:
+; Returns actual count and z if held item matches, otherwise 5 and nz. 5 isn't
+; necessarily the regular duration, but is set by default since it usually is.
 	push bc
 	push hl
-	ld c, a
-	push bc
+	ld h, a
+	push hl
 	call GetUserItem
+	pop hl
 	ld a, b
-	pop bc
-	cp c
+	cp h
 	ld a, 5
 	jr nz, .got_duration
-	ld a, 8
+	ld a, c
 .got_duration
 	pop hl
 	pop bc

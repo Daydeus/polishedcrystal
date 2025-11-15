@@ -172,9 +172,6 @@ TraceAbility:
 	pop af
 	ld [hl], a
 	jmp RunEntryAbilitiesInner
-.trace_failure
-	ld hl, TraceFailureText
-	jmp StdBattleTextbox
 
 ; Lasts 5 turns consistent with Generation VI.
 DrizzleAbility:
@@ -263,10 +260,10 @@ IntimidateAbility:
 	call z, StatUpAbility
 
 .continue
-	call EndAbility
-	farcall CheckStatHerbsAfterIntimidate
 	call SwitchTurn
-	farjp CheckMirrorHerb
+	call EndAbility
+	farcall CheckMirrorHerb
+	farjp CheckStatHerbsAfterIntimidate
 
 INCLUDE "data/abilities/no_intimidate_abilities.asm"
 
@@ -1182,8 +1179,10 @@ UserAccuracyAbilities:
 	dbw -1, -1
 
 TargetAccuracyAbilities:
+	; note that Wonder Skin needs to be checked separately, because
+	; by the time this callback runs, base accuracy has already been
+	; accounted for.
 	dbw TANGLED_FEET, TangledFeetAbility
-	dbw WONDER_SKIN, WonderSkinAbility
 	dbw SAND_VEIL, SandVeilAbility
 	dbw SNOW_CLOAK, SnowCloakAbility
 	dbw -1, -1
@@ -1208,13 +1207,15 @@ TangledFeetAbility:
 	jmp MultiplyAndDivide
 
 WonderSkinAbility:
-; Double evasion for status moves
+; Set move accuracy to 50% if it's a status move
 	ld a, BATTLE_VARS_MOVE_CATEGORY
 	call GetBattleVar
 	cp STATUS
 	ret nz
-	ln a, 1, 2 ; x0.5
-	jmp MultiplyAndDivide
+	ld a, BATTLE_VARS_MOVE_ACCURACY
+	call GetBattleVarAddr
+	ld [hl], 50
+	ret
 
 SwiftSwimAbility:
 	ld b, WEATHER_RAIN
@@ -1367,8 +1368,8 @@ HarvestAbility:
 	cp WEATHER_SUN
 	jr z, .ok
 	call BattleRandom
-	and 1
-	ret z
+	add a
+	ret c
 
 .ok
 	; Don't do anything if we have an item already
@@ -1733,7 +1734,7 @@ AnalyticAbility:
 TintedLensAbility:
 ; Doubles damage for not very effective moves (x0.5/x0.25)
 	ld a, [wTypeModifier]
-	cp $10
+	cp EFFECTIVE
 	ret nc
 	ln a, 2, 1 ; x2
 	jmp MultiplyAndDivide
@@ -1767,7 +1768,9 @@ IronFistAbility:
 	jr MoveBoostAbility
 
 IsPunchingMove:
-; Returns z if the move is a punching move, otherwise nz|nc.
+; Returns z if the used move is a punching move, otherwise nz|nc.
+	ld a, BATTLE_VARS_MOVE
+	call GetBattleVar
 	ld hl, PunchingMoves
 	call IsInByteArray
 	sbc a
@@ -1884,7 +1887,7 @@ EnemySolidRockAbility:
 EnemyFilterAbility:
 ; 75% damage for super effective moves
 	ld a, [wTypeModifier]
-	cp $11
+	cp EFFECTIVE + 1
 	ret c
 	ln a, 3, 4 ; x0.75
 	jmp MultiplyAndDivide
@@ -2037,9 +2040,17 @@ ShowAbilityActivation::
 	call PerformAbilityGFX
 	jmp PopBCDEHL
 
+ShowPotentialSpecificAbilityActivation:
+; ShowPotentialAbilityActivation if user's ability matches ability in a.
+	push bc
+	ld b, a
+	call GetTrueUserAbility
+	cp b
+	pop bc
+	ret nz
 ShowPotentialAbilityActivation:
 ; This avoids duplicating checks to avoid text spam. This will run
-; ShowAbilityActivation if animations are disabled (something only abilities do)
+; ShowAbilityActivation if we're within an ability execution (see BeginAbility).
 	ld a, [wInAbility]
 	and a
 	ret z
@@ -2153,33 +2164,9 @@ RunPostBattleAbilities::
 	call GetPartyParamLocationAndValue
 
 	; Are we holding an item currently?
-	ld a, [hl]
-	and a
-	jr z, .not_holding_item
-
-	; If we are already holding an item, check if we have room in the bag.
-	; If we don't, abort the ability activation.
-	push hl
-	push de
-	push bc
-	ld a, c
-	ld [wCurItem], a
-	ld a, 1
-	ld [wItemQuantityChangeBuffer], a
-	ld hl, wNumItems
-	call ReceiveItem
-	pop bc
-	pop de
-	pop hl
+	farcall ReceiveBattleItem
 	ret nc
 	ld a, c
-	jr .gave_item
-
-.not_holding_item
-	ld a, c
-	ld [hl], a
-
-.gave_item
 	push de
 	push bc
 	ld [wNamedObjectIndex], a

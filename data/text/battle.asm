@@ -593,6 +593,11 @@ WokeUpText:
 	line "woke up!"
 	prompt
 
+WasFrozenText:
+	text "<TARGET>"
+	line "was frozen solid!"
+	prompt
+
 FrozenSolidText:
 	text "<USER>"
 	line "is frozen solid!"
@@ -843,6 +848,11 @@ CriticalHitText:
 	text "A critical hit!"
 	prompt
 
+ExtremelyEffectiveText:
+	text "It's extremely"
+	line "effective!"
+	prompt
+
 SuperEffectiveText:
 	text "It's super"
 	line "effective!"
@@ -851,6 +861,11 @@ SuperEffectiveText:
 NotVeryEffectiveText:
 	text "It's not very"
 	line "effective…"
+	prompt
+
+MostlyIneffectiveText:
+	text "It's mostly"
+	line "ineffective…"
 	prompt
 
 TookDownWithItText:
@@ -1483,12 +1498,6 @@ TraceActivationText:
 	cont ""
 	text_ram wStringBuffer1
 	text "!"
-	prompt
-
-TraceFailureText:
-	text "<USER>"
-	line "failed to trace"
-	cont "<TARGET>!"
 	prompt
 
 BattleText_IntimidateResisted:

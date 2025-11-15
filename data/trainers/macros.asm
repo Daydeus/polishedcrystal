@@ -49,22 +49,34 @@ endc
 
 MACRO dv_spread
 	def_dvs \#
-	if !DEF(DV_SPREAD_FOR_{d:EV_HP}_{d:EV_ATK}_{d:EV_DEF}_{d:EV_SPE}_{d:EV_SAT}_{d:EV_SDF})
-		def DV_SPREAD_FOR_{d:EV_HP}_{d:EV_ATK}_{d:EV_DEF}_{d:EV_SPE}_{d:EV_SAT}_{d:EV_SDF} = NUM_DV_SPREADS
-		with_each_stat "def DV_SPREAD_{d:NUM_DV_SPREADS}_? EQU EV_?"
+	REDEF DV_SPREAD_FOR EQUS "DV_SPREAD_FOR_"
+	for x, 1, EACH_SPREAD_STAT
+		REDEF DV_SPREAD_FOR EQUS #DV_SPREAD_FOR ++ "_{d:VV_{STATS{x}}}"
+	endr
+	if !DEF({DV_SPREAD_FOR})
+		def {DV_SPREAD_FOR} = NUM_DV_SPREADS
+		for x, 1, EACH_SPREAD_STAT
+			def DV_SPREAD_{d:NUM_DV_SPREADS}_{STATS{x}} EQU VV_{STATS{x}}
+		endr
 		redef NUM_DV_SPREADS += 1
 	endc
-	db DV_SPREAD_FOR_{d:EV_HP}_{d:EV_ATK}_{d:EV_DEF}_{d:EV_SPE}_{d:EV_SAT}_{d:EV_SDF}
+	db {DV_SPREAD_FOR}
 ENDM
 
 MACRO ev_spread
 	def_evs \#
-	if !DEF(EV_SPREAD_FOR_{d:EV_HP}_{d:EV_ATK}_{d:EV_DEF}_{d:EV_SPE}_{d:EV_SAT}_{d:EV_SDF})
-		def EV_SPREAD_FOR_{d:EV_HP}_{d:EV_ATK}_{d:EV_DEF}_{d:EV_SPE}_{d:EV_SAT}_{d:EV_SDF} = NUM_EV_SPREADS
-		with_each_stat "def EV_SPREAD_{d:NUM_EV_SPREADS}_? EQU EV_?"
+	REDEF EV_SPREAD_FOR EQUS "EV_SPREAD_FOR_"
+	for x, 1, EACH_SPREAD_STAT
+		REDEF EV_SPREAD_FOR EQUS #EV_SPREAD_FOR ++ "_{d:VV_{STATS{x}}}"
+	endr
+	if !DEF({EV_SPREAD_FOR})
+		def {EV_SPREAD_FOR} = NUM_EV_SPREADS
+		for x, 1, EACH_SPREAD_STAT
+			def EV_SPREAD_{d:NUM_EV_SPREADS}_{STATS{x}} EQU VV_{STATS{x}}
+		endr
 		redef NUM_EV_SPREADS += 1
 	endc
-	db EV_SPREAD_FOR_{d:EV_HP}_{d:EV_ATK}_{d:EV_DEF}_{d:EV_SPE}_{d:EV_SAT}_{d:EV_SDF}
+	db {EV_SPREAD_FOR}
 ENDM
 
 DEF _tr_class = 0
@@ -138,11 +150,12 @@ MACRO tr_mon
 		shift ; since it's optional
 	endc
 
-	if STRIN("\2", "@") != 0
+	def _tr_sep = STRFIND("\2", " @ ")
+	if _tr_sep != -1
 		; Format "Species @ Item" was used, so add the item.
 		def _tr_flags |= TRAINERTYPE_ITEM
-		redef _tr_pk{d:p}_item EQUS STRSLICE("\2", STRFIND("\2", " @ ") + 3, STRLEN("\2"))
-		redef _tr_pk{d:p}_species EQUS STRSLICE("\2", 0, STRFIND("\2", " @ "))
+		redef _tr_pk{d:p}_species EQUS STRSLICE("\2", 0, _tr_sep)
+		redef _tr_pk{d:p}_item EQUS STRSLICE("\2", _tr_sep + STRLEN(" @ "))
 	else
 		; Just "Species", no held item.
 		redef _tr_pk{d:p}_species EQUS "\2"
@@ -198,7 +211,7 @@ MACRO tr_extra
 
 	; All of these fields are optional.
 	for i, 1, _NARG + 1
-		if !STRCMP("\<i>", "SHINY")
+		if "\<i>" === "SHINY"
 			redef _tr_pk{d:p}_extra |= SHINY_MASK
 		elif DEF(NAT_\<i>)
 			redef _tr_pk{d:p}_extra |= NAT_\<i>
@@ -225,9 +238,9 @@ MACRO tr_dvs
 ; WARNING: Unlike tr_evs, unmentioned DVs will be set to 15, not 0!
 	def _tr_flags |= TRAINERTYPE_DVS
 
-	; check if a constant was used
-	if STRFIND("\#", "_") != -1
-		redef _tr_pk{d:p}_dvs EQUS "{\#}"
+	; check if a constant was used, e.g. DVS_HP_*
+	if STRFIND("\#", "_") != -1 && STRFIND("\#", ",") == -1
+		redef _tr_pk{d:p}_dvs EQUS #\#
 	else
 		redef _tr_pk{d:p}_dvs EQUS "\#"
 	endc

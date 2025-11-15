@@ -443,7 +443,6 @@ HandleFutureSight:
 	xor a
 	ld [wAttackMissed], a
 	ld [wAlreadyDisobeyed], a
-	; Future Sight does typeless damage
 	ld a, EFFECTIVE
 	ld [wTypeModifier], a
 	farcall DoMove
@@ -627,15 +626,12 @@ IncrementToxic:
 	bit TOX, a
 	ret z
 
+	; Cap toxic counter at 15. Do not return z.
 	inc [hl]
-
-	; Cap toxic counter at 15.
 	ld a, [hl]
-	cp 15
-	jr nz, .no_overflow
+	cp 16
+	ret c
 	dec [hl]
-.no_overflow
-	inc [hl]
 	ret
 
 DoPoisonBurnDamageAnim:
@@ -799,6 +795,24 @@ EndturnEncoreDisable_End:
 	ld h, d
 	ld l, e
 	jmp StdBattleTextbox
+
+TickDisableAfterMove:
+; If we have 5 turns left of Disable, tick it down. This makes it so that
+; Disable covers 4 move uses.
+	call HasUserFainted
+	ret z
+	ldh a, [hBattleTurn]
+	and a
+	ld hl, wPlayerDisableCount
+	jr z, .got_disable_count
+	ld hl, wEnemyDisableCount
+.got_disable_count
+	ld a, [hl]
+	and $f
+	cp 5
+	ret nz
+	dec [hl]
+	ret
 
 HandleDisable:
 	call SetFastestTurn
@@ -994,7 +1008,7 @@ HandleStatusOrbs:
 	ret z
 
 	; bypass ineffectiveness checks to avoid residual results from last attack
-	ld a, $10
+	ld a, EFFECTIVE
 	ld [wTypeModifier], a
 
 	farcall GetOpponentItemAfterUnnerve

@@ -716,6 +716,10 @@ InitRoamMons:
 
 CheckEncounterRoamMon:
 	push hl
+; Don't trigger an encounter if we're using Sweet Honey.
+	ld hl, wStatusFlags2
+	bit STATUSFLAGS2_USING_SWEET_HONEY_F, [hl]
+	jr nz, .DontEncounterRoamMon
 ; Don't trigger an encounter if we're on water.
 	call CheckOnWater
 	jr z, .DontEncounterRoamMon
@@ -1098,8 +1102,8 @@ RandomPhoneMon:
 	; bc == size of mon sub-struct
 	ld b, 0
 
-	; b currently holds party size in bytes
-	ld a, b
+	; c currently holds party size in bytes
+	ld a, c
 	add l
 	ld e, 0
 	push hl
