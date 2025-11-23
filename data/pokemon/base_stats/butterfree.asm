@@ -26,7 +26,7 @@ if DEF(FAITHFUL)
 else
 	abilities_for BUTTERFREE, COMPOUND_EYES, LEVITATE, TINTED_LENS
 endc
-	db GROWTH_MEDIUM_FAST ; growth rate
+	db GROWTH_FAST ; growth rate
 	dn EGG_BUG, EGG_BUG ; egg groups
 
 	ev_yield 2 SAt, 1 SDf

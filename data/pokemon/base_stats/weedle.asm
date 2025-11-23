@@ -8,7 +8,7 @@
 	dn GENDER_F50, HATCH_FAST ; gender ratio, step cycles to hatch
 
 	abilities_for WEEDLE, SHIELD_DUST, RUN_AWAY, POISON_POINT
-	db GROWTH_MEDIUM_FAST ; growth rate
+	db GROWTH_FAST ; growth rate
 	dn EGG_BUG, EGG_BUG ; egg groups
 
 	ev_yield 1 Spe

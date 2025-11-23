@@ -17,7 +17,7 @@ endc
 	dn GENDER_F50, HATCH_FAST ; gender ratio, step cycles to hatch
 
 	abilities_for BEEDRILL, SWARM, SNIPER, ADAPTABILITY
-	db GROWTH_MEDIUM_FAST ; growth rate
+	db GROWTH_FAST ; growth rate
 	dn EGG_BUG, EGG_BUG ; egg groups
 
 	ev_yield 2 Atk, 1 SDf
