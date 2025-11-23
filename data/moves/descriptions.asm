@@ -489,10 +489,6 @@ FocusBlastDescription:
 	done
 
 MudSlapDescription:
-	text "An attack that"
-	next "lowers accuracy."
-	done
-
 OctazookaDescription:
 	text "An attack that may"
 	next "lower accuracy."
