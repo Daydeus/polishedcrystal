@@ -66,8 +66,6 @@ PidgeyEggSpeciesMoves:
 	db CHARM
 	db EXTREMESPEED
 	db BRAVE_BIRD
-	db DRILL_PECK
-	db HURRICANE
 	db $ff
 
 RattataPlainEggSpeciesMoves:
