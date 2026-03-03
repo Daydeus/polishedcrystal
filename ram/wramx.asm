@@ -140,6 +140,7 @@ wPrevPartyLevel::
 wUnownPuzzleCornerTile::
 wKeepSevenBiasChance::
 wTempDayOfWeek::
+wSuicuneFrame::
 	db
 
 	ds 59
@@ -508,7 +509,13 @@ wDexCacheOwn:: dw
 wDexPrevCursorPos:: db
 wDexPrevOffset:: db
 
-	ds 32 ; unused
+wOptionsMenuValueCoord:: dw
+wOptionsMenuDescriptionAddr:: dw
+wOptionsMenuDescriptionState:: db
+wOptionsMenuLastSelection:: db
+wOptionsMenuIsInitial:: db
+
+	ds 25 ; unused
 
 wOverworldMapAnchor:: dw
 wMetatileStandingY:: db
@@ -561,13 +568,10 @@ wEvolvableFlags:: flag_array PARTY_LENGTH
 wForceEvolution:: db
 
 UNION
-; general-purpose buffers
-wBuffer1:: db
-wBuffer2:: db
-wBuffer3:: db
-wBuffer4:: db
-wBuffer5:: db
-wBuffer6:: db
+; general-purpose HP buffers
+wHPBuffer1:: dw
+wHPBuffer2:: dw
+wHPBuffer3:: dw
 
 NEXTU
 ; HP bar animations
@@ -601,6 +605,136 @@ NEXTU
 wMintTeaPartyMon:: db
 wMintTeaLikedFlavor:: db
 wMintTeaDislikedFlavor:: db
+
+NEXTU
+; thrown ball data
+wFinalCatchRate:: db
+wThrownBallWobbleCount:: db
+
+NEXTU
+; experience
+wExpToNextLevel:: ds 3
+
+NEXTU
+; PP Up
+wPPUpPPBuffer:: ds NUM_MOVES
+
+NEXTU
+; lucky number show
+wMonIDDigitsBuffer:: ds 5
+
+NEXTU
+; mon submenu
+wMonSubmenuCount:: db
+wMonSubmenuItems:: ds NUM_MONMENU_ITEMS + 1
+
+NEXTU
+; move list formatting
+wListMovesLineSpacing:: db
+
+NEXTU
+; field move data
+wFieldMoveData::
+wFieldMoveJumptableIndex:: db
+wEscapeRopeOrDigType::
+wSurfingPlayerState::
+wFishingRodUsed:: db
+wCutWhirlpoolOverworldBlockAddr:: dw
+wCutWhirlpoolReplacementBlock:: db
+wCutWhirlpoolAnimationType::
+wFishingResult:: db
+	ds 1
+wFieldMoveDataEnd::
+
+NEXTU
+; hidden items
+wCurMapScriptBank:: db
+wRemainingBGEventCount:: db
+wBottomRightYCoord:: db
+wBottomRightXCoord:: db
+
+NEXTU
+; heal machine anim
+wHealMachineAnimType:: db
+wHealMachineTempOBP1:: db
+wHealMachineAnimState:: db
+
+NEXTU
+; decorations
+wCurDecoration:: db
+wSelectedDecorationSide:: db
+wSelectedDecoration:: db
+wOtherDecoration:: db
+wChangedDecorations:: db
+wCurDecorationCategory:: db
+
+NEXTU
+; withdraw/deposit items
+wPCItemQuantityChange:: db
+wPCItemQuantity:: db
+
+NEXTU
+; kurt
+wKurtApricornCount:: db
+wKurtApricornItems:: ds 10
+
+NEXTU
+; tree mons
+wTreeMonCoordScore:: db
+wTreeMonOTIDScore:: db
+
+NEXTU
+; restart clock
+wRestartClockCurDivision:: db
+wRestartClockPrevDivision:: db
+wRestartClockUpArrowYCoord:: db
+wRestartClockDay:: db
+wRestartClockHour:: db
+wRestartClockMin:: db
+
+NEXTU
+; move AI
+wEnemyAIMoveScores:: ds NUM_MOVES
+
+NEXTU
+; battle HUD
+wBattleHUDTiles:: ds PARTY_LENGTH
+
+NEXTU
+; forewarn ability
+wForewarnIterator:: db
+wForewarnEqualCount:: db
+wForewarnBestMove:: db
+wForewarnBestPower:: db
+
+NEXTU
+; item buy/sell price
+wBuySellPriceHi:: db
+wBuySellPriceLo:: db
+
+NEXTU
+; item count
+wItemCountHi:: db
+wItemCountLo:: db
+
+NEXTU
+; switch party mons
+	ds 1
+wSwitchPartyMonSource:: db
+wSwitchPartyMonTarget:: db
+
+NEXTU
+; wonder trade scratch
+wWonderTradeScratch:: ds 3
+
+NEXTU
+; judge machine
+wJudgeHyperTrainFlags:: db
+
+NEXTU
+; summary caught level
+	ds 1
+wSummaryCaughtLevel:: db
 
 NEXTU
 ; link data
@@ -1052,7 +1186,9 @@ wHallOfFameCount:: dw
 wTradeFlags:: flag_array PARTY_LENGTH
 
 wMooMooBerries:: db
-wUndergroundSwitchPositions:: db
+
+	ds 1 ; unused
+
 wFarfetchdPosition:: db
 
 ; map triggers
@@ -1138,7 +1274,7 @@ wTeamRocketBaseB2FSceneID:: db
 wTeamRocketBaseB3FSceneID:: db
 wTinTower1FSceneID:: db
 wTradeCenterSceneID:: db
-wUndergroundPathSwitchRoomEntrancesSceneID:: db
+wGoldenrodUndergroundSwitchRoomSceneID:: db
 wVermilionCitySceneID:: db
 wVermilionPortSceneID:: db
 wVictoryRoad2FSceneID:: db
@@ -1195,35 +1331,35 @@ wEmotePal:: db
 wOvercastRandomDay:: db
 wOvercastCurIntensity:: db
 wOvercastRandomMaps::
-wOvercastRandomMapIntensityJohto1:: db
-wOvercastRandomMapGroupJohto1:: db
-wOvercastRandomMapNumberJohto1:: db
-wOvercastRandomMapIntensityJohto2:: db
-wOvercastRandomMapGroupJohto2:: db
-wOvercastRandomMapNumberJohto2:: db
-wOvercastRandomMapIntensityKanto1:: db
-wOvercastRandomMapGroupKanto1:: db
-wOvercastRandomMapNumberKanto1:: db
-wOvercastRandomMapIntensityKanto2:: db
-wOvercastRandomMapGroupKanto2:: db
-wOvercastRandomMapNumberKanto2:: db
+	overcast_random_map Johto1
+	overcast_random_map Johto2
+	overcast_random_map Kanto1
+	overcast_random_map Kanto2
 
-	ds 50 ; unused
+wNeededMonPalLight:: db ; for SPRITE_MON_ICON two-nybble palettes, stores the light color palette index
+wNeededPalType:: db ; 0 = normal palette, non-zero = mon two-nybble palette
+wLoadedObjPalType:: db ; bitmask: bit N set = slot N is a mon palette, clear = normal palette
+
+	ds 47 ; unused
 
 wCandyAmounts::
+	table_width 1
 wExpCandyXSAmount:: db
 wExpCandySAmount:: db
 wExpCandyMAmount:: db
 wExpCandyLAmount:: db
 wExpCandyXLAmount:: db
+	assert_table_length NUM_CANDIES
 
 wWingAmounts::
+	table_width 2
 wHealthWingAmount:: dw
 wMuscleWingAmount:: dw
 wResistWingAmount:: dw
 wSwiftWingAmount:: dw
 wGeniusWingAmount:: dw
 wCleverWingAmount:: dw
+	assert_table_length NUM_WINGS
 
 wCelebiEvent:: db
 
@@ -1800,6 +1936,8 @@ wAbilityTiles:: ds 22 tiles
 ; + 1 to include the "'s"
 wAbilityPkmn:: ds MON_NAME_LENGTH + 1
 wAbilityName:: ds 20
+wAbilityFlags:: db
+wAbilityDisplaySpeed:: db ; (Characters - 1) per DelayFrame
 NEXTU
 wWeatherScratch:: ds SCREEN_HEIGHT_PX
 ENDU

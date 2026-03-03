@@ -96,6 +96,12 @@ _HowManyShouldIMakeText::
 	line "make?"
 	done
 
+SECTION "_HowManyDoYouWantToSellText", ROMX
+_HowManyDoYouWantToSellText::
+	text "How many do you"
+	line "want to sell?"
+	done
+
 SECTION "_RecoveredSomeHPText", ROMX
 _RecoveredSomeHPText::
 	text_ram wStringBuffer1
@@ -3343,17 +3349,6 @@ _SaveFileCorruptedText::
 	text "The save file is"
 	line "corrupted!"
 	prompt
-
-SECTION "_WindowPoppingErrorText", ROMX
-_WindowPoppingErrorText::
-	text "No windows avail-"
-	line "able for popping."
-	done
-
-SECTION "_ObjectEventText", ROMX
-_ObjectEventText::
-	text "Object event"
-	done
 
 SECTION "_GainedItemText", ROMX
 _GainedItemText::

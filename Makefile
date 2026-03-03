@@ -109,7 +109,7 @@ tools:
 	$(MAKE) -C tools/
 
 clean: tidy
-	find gfx maps data/tilesets -name '*.lz' -delete
+	find gfx maps data/tilesets -name '*.lzp' -delete
 	find gfx \( -name '*.[12]bpp' -o -name '*.2bpp.vram[012]' -o -name '*.2bpp.vram[012]p' \) -delete
 	find gfx/pokemon -mindepth 1 \( -name 'bitmask.asm' -o -name 'frames.asm' \
 		-o -name 'front.animated.tilemap' -o -name 'front.dimensions' \) -delete
@@ -220,6 +220,7 @@ gfx/paintings/%.2bpp: RGBGFXFLAGS += -Z
 gfx/player/chris_back.2bpp: RGBGFXFLAGS += -Z
 gfx/player/kris_back.2bpp: RGBGFXFLAGS += -Z
 gfx/player/crys_back.2bpp: RGBGFXFLAGS += -Z
+gfx/player/beta_back.2bpp: RGBGFXFLAGS += -Z
 
 gfx/pokedex/%.bin: gfx/pokedex/%.tilemap gfx/pokedex/%.attrmap ; $Qcat $^ > $@
 gfx/pokedex/pokedex.2bpp: gfx/pokedex/pokedex0.2bpp gfx/pokedex/pokedex1.2bpp gfx/pokedex/area.2bpp ; $Qcat $^ > $@
@@ -239,8 +240,12 @@ gfx/slots/slots_3.2bpp: tools/gfx += --interleave --png=$< --remove-duplicates -
 gfx/stats/judge.2bpp: tools/gfx += --trim-whitespace
 
 gfx/title/crystal.2bpp: tools/gfx += --interleave --png=$<
-gfx/title/unowns.2bpp: tools/gfx += --trim-whitespace
-gfx/title/logo_bg.2bpp: gfx/title/logo.2bpp gfx/title/version.2bpp gfx/title/unowns.2bpp ; $Qcat $^ > $@
+gfx/title/logo_bg.2bpp: gfx/title/logo.2bpp gfx/title/version.2bpp ; $Qcat $^ > $@
+
+gfx/title/suicune_unowns.2bpp: RGBGFXFLAGS += --unique-tiles --nb-tiles 127,127 --base-tiles 0,128
+gfx/title/suicune_unowns.tilemap: RGBGFXFLAGS += --unique-tiles --nb-tiles 127,127 --base-tiles 0,128
+gfx/title/suicune_unowns.tilemap: gfx/title/suicune_unowns.png
+	$Q$(RGBGFX) -c dmg $(RGBGFXFLAGS) -t $@ $<
 
 gfx/town_map/town_map.2bpp: tools/gfx += --trim-whitespace
 
@@ -254,6 +259,7 @@ gfx/trade/trade_screen.2bpp: gfx/trade/border.2bpp gfx/trade/textbox.2bpp ; $Qca
 gfx/trainer_card/chris_card.2bpp: RGBGFXFLAGS += -Z
 gfx/trainer_card/kris_card.2bpp: RGBGFXFLAGS += -Z
 gfx/trainer_card/crys_card.2bpp: RGBGFXFLAGS += -Z
+gfx/trainer_card/beta_card.2bpp: RGBGFXFLAGS += -Z
 
 gfx/trainers/%.2bpp: RGBGFXFLAGS += -Z
 
@@ -272,7 +278,8 @@ gfx/pokemon/%/frames.asm: gfx/pokemon/%/front.animated.tilemap gfx/pokemon/%/fro
 	$Qtools/pokemon_animation -f $^ > $@
 
 
-%.lz: %
+
+%.lzp: %
 	$Qtools/lzcomp -- $< $@
 
 #%.4bpp: %.png

@@ -98,21 +98,28 @@ NamingScreen:
 
 .Player:
 	farcall _GetPlayerIcon
+	push hl
 	ld a, [wPlayerGender]
-	ld c, SPRITE_ANIM_INDEX_RED_WALK
-	and a ; PLAYER_MALE
-	jr z, .got_player_walk
-	ld c, SPRITE_ANIM_INDEX_BLUE_WALK
-	dec a ; PLAYER_FEMALE
-	jr z, .got_player_walk
-	; PLAYER_ENBY
-	ld c, SPRITE_ANIM_INDEX_GREEN_WALK
-.got_player_walk
+	add LOW(.PlayerSpriteAnims)
+	ld l, a
+	adc HIGH(.PlayerSpriteAnims)
+	sub l
+	ld h, a
+	ld c, [hl]
+	pop hl
 	call .LoadSprite
 	hlcoord 5, 2
 	ld de, .PlayerNameString
 	rst PlaceString
 	jmp .StoreSpriteIconParams
+
+.PlayerSpriteAnims:
+	table_width 1
+	db SPRITE_ANIM_INDEX_RED_WALK    ; PLAYER_MALE
+	db SPRITE_ANIM_INDEX_BLUE_WALK   ; PLAYER_FEMALE
+	db SPRITE_ANIM_INDEX_GREEN_WALK  ; PLAYER_ENBY
+	db SPRITE_ANIM_INDEX_PURPLE_WALK ; PLAYER_BETA
+	assert_table_length NUM_PLAYER_GENDERS
 
 .PlayerNameString:
 	db "Your name?@"
@@ -143,8 +150,8 @@ NamingScreen:
 
 .Box:
 	ld de, vTiles0 tile $00
-	ld hl, BallCutFruitSpriteGFX
-	lb bc, BANK(BallCutFruitSpriteGFX), 4
+	ld hl, BallCutTreeSpriteGFX
+	lb bc, BANK(BallCutTreeSpriteGFX), 4
 	call DecompressRequest2bpp
 	xor a
 	ld hl, wSpriteAnimDict
@@ -790,7 +797,7 @@ LoadNamingScreenGFX:
 	ret
 
 NamingScreenGFX_Border:
-INCBIN "gfx/naming_screen/naming_border.2bpp.lz"
+INCBIN "gfx/naming_screen/naming_border.2bpp.lzp"
 
 NamingScreenGFX_Cursor:
 INCBIN "gfx/naming_screen/naming_cursor.2bpp"
@@ -867,7 +874,7 @@ _ComposeMailMessage:
 	ret
 
 .MailIcon:
-INCBIN "gfx/naming_screen/mail.2bpp.lz"
+INCBIN "gfx/naming_screen/mail.2bpp.lzp"
 
 .initwNamingScreenMaxNameLength
 	ld a, MAIL_MSG_LENGTH + 1

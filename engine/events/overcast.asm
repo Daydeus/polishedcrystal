@@ -16,6 +16,8 @@ GetOvercastIndex::
 	jr z, .lake_of_rage_route_43
 	cp GROUP_STORMY_BEACH ; GROUP_GOLDENROD_CITY, GROUP_MAGNET_TUNNEL_WEST, GROUP_ROUTE_34, GROUP_ROUTE_34_COAST
 	jr z, .stormy_beach_goldenrod_city_route_34
+	cp GROUP_ROUTE_10_NORTH ; GROUP_ROUTE_9
+	jr z, .route_10_north
 .not_overcast:
 	xor a ; NOT_OVERCAST
 	ret
@@ -36,6 +38,8 @@ GetOvercastIndex::
 	jr z, .not_overcast
 	cp FRIDAY
 	jr z, .not_overcast
+	ld a, OVERCAST_INTENSITY_RAIN
+	ld [wOvercastCurIntensity], a
 	ld a, AZALEA_OVERCAST
 	ret
 
@@ -59,6 +63,8 @@ GetOvercastIndex::
 	cp FRIDAY
 	jr nz, .not_overcast
 .overcast_lake_of_rage
+	ld a, OVERCAST_INTENSITY_THUNDERSTORM
+	ld [wOvercastCurIntensity], a
 	ld a, LAKE_OF_RAGE_OVERCAST
 	ret
 
@@ -80,8 +86,36 @@ GetOvercastIndex::
 ; Only overcast while Team Rocket is present
 	eventflagcheck EVENT_GOLDENROD_CITY_ROCKET_TAKEOVER
 	jr nz, .not_overcast
-.overcast_stormy_beach
+	ld a, OVERCAST_INTENSITY_RAIN
+	ld [wOvercastCurIntensity], a
 	ld a, STORMY_BEACH_OVERCAST
+	ret
+
+.overcast_stormy_beach
+	ld a, OVERCAST_INTENSITY_THUNDERSTORM
+	ld [wOvercastCurIntensity], a
+	ld a, STORMY_BEACH_OVERCAST
+	ret
+
+.route_10_north:
+; Only overcast while Zapdos is present
+	eventflagcheck EVENT_ROUTE_10_ZAPDOS
+	jmp nz, .not_overcast
+; Route 10 North, Route 9
+	ld a, [wMapNumber]
+	cp MAP_ROUTE_9
+	jr z, .overcast_route_9
+	cp MAP_ROUTE_10_NORTH
+	jmp nz, .not_overcast
+	ld a, OVERCAST_INTENSITY_THUNDERSTORM
+	ld [wOvercastCurIntensity], a
+	ld a, ROUTE_10_OVERCAST
+	ret
+
+.overcast_route_9
+	ld a, OVERCAST_INTENSITY_RAIN
+	ld [wOvercastCurIntensity], a
+	ld a, ROUTE_10_OVERCAST
 	ret
 
 CheckGenericOvercast:
@@ -191,58 +225,47 @@ GetAliasedGroup:
 	ret
 
 GenerateNewRandomOvercastMaps:
+	ld bc, wOvercastRandomMaps
+
+	assert wOvercastRandomMaps + 0 == wOvercastRandomMapJohto1
 	ld a, NUM_JOHTO_OVERCAST_MAPS
 	ld de, RandomOvercastMapsJohto
-	call RandomRange
-	ld h, 0
-	ld l, a
-	add hl, hl
-	add hl, de
-	ld a, [hli]
-	ld [wOvercastRandomMapGroupJohto1], a
-	ld a, [hli]
-	ld [wOvercastRandomMapNumberJohto1], a
-	call GenerateRandomIntensity
-	ld [wOvercastRandomMapIntensityJohto1], a
+	call .GenerateNextOvercastMap
+
+	assert wOvercastRandomMaps + 3 == wOvercastRandomMapJohto2
 	ld a, NUM_JOHTO_OVERCAST_MAPS
 	ld de, RandomOvercastMapsJohto
-	call RandomRange
-	ld h, 0
-	ld l, a
-	add hl, hl
-	add hl, de
-	ld a, [hli]
-	ld [wOvercastRandomMapGroupJohto2], a
-	ld a, [hli]
-	ld [wOvercastRandomMapNumberJohto2], a
-	call GenerateRandomIntensity
-	ld [wOvercastRandomMapIntensityJohto2], a
+	call .GenerateNextOvercastMap
+
+	assert wOvercastRandomMaps + 6 == wOvercastRandomMapKanto1
 	ld a, NUM_KANTO_OVERCAST_MAPS
 	ld de, RandomOvercastMapsKanto
-	call RandomRange
-	ld h, 0
-	ld l, a
-	add hl, hl
-	add hl, de
-	ld a, [hli]
-	ld [wOvercastRandomMapGroupKanto1], a
-	ld a, [hli]
-	ld [wOvercastRandomMapNumberKanto1], a
-	call GenerateRandomIntensity
-	ld [wOvercastRandomMapIntensityKanto1], a
+	call .GenerateNextOvercastMap
+
+	assert wOvercastRandomMaps + 9 == wOvercastRandomMapKanto2
 	ld a, NUM_KANTO_OVERCAST_MAPS
 	ld de, RandomOvercastMapsKanto
+	; fallthrough
+
+.GenerateNextOvercastMap:
+	inc bc
 	call RandomRange
 	ld h, 0
 	ld l, a
 	add hl, hl
 	add hl, de
 	ld a, [hli]
-	ld [wOvercastRandomMapGroupKanto2], a
+	ld [bc], a ; map group
+	inc bc
 	ld a, [hli]
-	ld [wOvercastRandomMapNumberKanto2], a
+	ld [bc], a ; map number
+	dec bc
+	dec bc
 	call GenerateRandomIntensity
-	ld [wOvercastRandomMapIntensityKanto2], a
+	ld [bc], a ; intensity
+	inc bc
+	inc bc
+	inc bc
 	ret
 
 GenerateRandomIntensity:

@@ -16,6 +16,7 @@ RandomAliasedOvercastMapGroups:
 	overcast_area AREA_NATIONAL_PARK, NATIONAL_PARK, NATIONAL_PARK_BUG_CONTEST
 	overcast_area AREA_ECRUTEAK, ECRUTEAK_CITY, ECRUTEAK_SHRINE_OUTSIDE, BELLCHIME_TRAIL
 	overcast_area AREA_ROUTE_35_COAST, ROUTE_35_COAST_NORTH, ROUTE_35_COAST_SOUTH
+	overcast_area AREA_ROUTE_40, ROUTE_40, BATTLE_TOWER_OUTSIDE
 	overcast_area AREA_ROUTES_47_48, ROUTE_47, ROUTE_48
 	overcast_area AREA_ROUTE_42, ROUTE_42, VIOLET_OUTSKIRTS
 	overcast_area AREA_LAKE_OF_RAGE, ROUTE_43, LAKE_OF_RAGE
@@ -23,7 +24,8 @@ RandomAliasedOvercastMapGroups:
 	overcast_area AREA_ROUTE_10, ROUTE_10_NORTH, ROUTE_10_SOUTH
 	overcast_area AREA_ROUTE_12, ROUTE_12_NORTH, ROUTE_12_SOUTH
 	overcast_area AREA_ROUTE_13, ROUTE_13_EAST, ROUTE_13_WEST
-	overcast_area AREA_ROUTE_16, ROUTE_16_NORTHEAST, ROUTE_16_NORTHWEST, ROUTE_16_SOUTH, ROUTE_16_WEST
+	overcast_area AREA_ROUTE_16, ROUTE_16_EAST, ROUTE_16_NORTH, ROUTE_16_WEST
+	overcast_area AREA_ROUTE_17, ROUTE_17_NORTH, ROUTE_17_SOUTH
 	overcast_area AREA_ROUTE_18, ROUTE_18_EAST, ROUTE_18_WEST
 	overcast_area AREA_URAGA_CHANNEL, URAGA_CHANNEL_EAST, URAGA_CHANNEL_WEST
 
@@ -38,7 +40,6 @@ ENDM
 
 RandomOvercastMapsJohto:
 	const_def
-	overcast_map BATTLE_TOWER_OUTSIDE
 	overcast_map BLACKTHORN_CITY
 	overcast_map CHERRYGROVE_BAY
 	overcast_map CHERRYGROVE_CITY
@@ -58,7 +59,6 @@ RandomOvercastMapsJohto:
 	overcast_map ROUTE_37
 	overcast_map ROUTE_38
 	overcast_map ROUTE_39
-	overcast_map ROUTE_40
 	overcast_map ROUTE_41
 	overcast_map ROUTE_44
 	overcast_map ROUTE_45
@@ -66,7 +66,6 @@ RandomOvercastMapsJohto:
 	overcast_map RUINS_OF_ALPH_OUTSIDE
 	overcast_map SILVER_CAVE_OUTSIDE
 	overcast_map SINJOH_RUINS
-	overcast_map SNOWTOP_MOUNTAIN_INSIDE
 	overcast_map STORMY_BEACH
 	overcast_map VIOLET_CITY
 	overcast_map YELLOW_FOREST
@@ -78,6 +77,7 @@ RandomOvercastMapsJohto:
 	overcast_map AREA_NATIONAL_PARK
 	overcast_map AREA_ECRUTEAK
 	overcast_map AREA_ROUTE_35_COAST
+	overcast_map AREA_ROUTE_40
 	overcast_map AREA_ROUTES_47_48
 	overcast_map AREA_ROUTE_42
 	overcast_map AREA_LAKE_OF_RAGE
@@ -100,7 +100,6 @@ RandomOvercastMapsKanto:
 	overcast_map LIGHTNING_ISLAND_ROOF
 	overcast_map LUCKY_ISLAND
 	overcast_map MOUNT_MOON_SQUARE
-	overcast_map NAVEL_ROCK_OUTSIDE
 	overcast_map PALLET_TOWN
 	overcast_map PEWTER_CITY
 	overcast_map ROCKY_BEACH
@@ -108,7 +107,6 @@ RandomOvercastMapsKanto:
 	overcast_map ROUTE_11
 	overcast_map ROUTE_14
 	overcast_map ROUTE_15
-	overcast_map ROUTE_17
 	overcast_map ROUTE_19
 	overcast_map ROUTE_20
 	overcast_map ROUTE_21
@@ -148,6 +146,7 @@ RandomOvercastMapsKanto:
 	overcast_map AREA_ROUTE_12
 	overcast_map AREA_ROUTE_13
 	overcast_map AREA_ROUTE_16
+	overcast_map AREA_ROUTE_17
 	overcast_map AREA_ROUTE_18
 	overcast_map AREA_URAGA_CHANNEL
 	DEF NUM_KANTO_OVERCAST_MAPS EQU const_value
