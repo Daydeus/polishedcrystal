@@ -117,23 +117,20 @@ LCDSummaryScreenProgress::
 	ld a, [hl]
 	assert SUMMARY_LCD_SHOW_WINDOW == 1
 	dec a
-	jr z, .show
+	ld hl, LCDSummaryScreenShowWindow
+	jr z, .setupNext
 	assert SUMMARY_LCD_SCROLL_BACKGROUND == 2
 	dec a
-	jr z, .nudge
-	ld hl, LCDSummaryScreenHideWindow
-	jr .setupNext
-.show
-	ld hl, LCDSummaryScreenShowWindow
-	jr .setupNext
-.nudge
-	ld hl, LCDSummaryScreenScrollBackground
-	; fallthrough
+	assert HIGH(LCDSummaryScreenShowWindow) == HIGH(LCDSummaryScreenScrollBackground)
+	ld l, LOW(LCDSummaryScreenScrollBackground)
+	jr z, .setupNext
+	assert HIGH(LCDSummaryScreenShowWindow) == HIGH(LCDSummaryScreenHideWindow)
+	ld l, LOW(LCDSummaryScreenHideWindow)
 .setupNext
 	ld a, l
-	ldh [hFunctionTargetLo], a
+	ldh [hLCDInterruptFunctionTargetLo], a
 	ld a, h
-	ldh [hFunctionTargetHi], a
+	ldh [hLCDInterruptFunctionTargetHi], a
 
 	; procede to next step
 	ld hl, wSummaryScreenStep

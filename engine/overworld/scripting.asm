@@ -1035,7 +1035,7 @@ ApplyObjectFacing::
 	hlcoord 0, 0
 	ld bc, SCREEN_AREA
 .loop
-	res 7, [hl]
+	res B_BG_PRIO, [hl]
 	inc hl
 	dec bc
 	ld a, b
@@ -1225,7 +1225,7 @@ Script_loadtrainer:
 	ld [wOtherTrainerClass], a
 	call GetScriptByte
 	ld [wOtherTrainerID], a
-	xor a
+	xor a ; TRAINERPAL_NONE
 	ld [wTrainerPal], a
 	ret
 
@@ -1242,7 +1242,7 @@ Script_loadtrainerwithpal:
 
 Script_startbattle:
 	call BufferScreen
-	predef StartBattle
+	farcall StartBattle
 	ld a, [wBattleResult]
 	and ~BATTLERESULT_BITMASK
 	ldh [hScriptVar], a
@@ -2494,7 +2494,7 @@ Script_verbosegivetmhm:
 	; off by one error?
 	ld hl, wTempTMHM
 	inc [hl]
-	predef GetTMHMMove
+	farcall GetTMHMMove
 	ld b, BANK(GiveTMHMScript)
 	ld de, GiveTMHMScript
 	jmp ScriptCall
@@ -2534,7 +2534,7 @@ Script_gettmhmname:
 	inc a
 	ld [wTempTMHM], a
 
-	predef GetTMHMMove
+	farcall GetTMHMMove
 	ld a, [wTempTMHM]
 	ld [wPutativeTMHMMove], a
 	call GetMoveName

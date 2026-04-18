@@ -1,7 +1,6 @@
-DEF NAMINGSCREEN_BORDER EQU $60
-DEF NAMINGSCREEN_MALE EQU $6b
-DEF NAMINGSCREEN_FEMALE EQU $6c
 DEF NAMINGSCREEN_CURSOR EQU $7e
+
+DEF NAMINGSCREEN_BORDER EQU '<SHINY>' + 1
 
 DEF NAMINGSCREEN_MIDDLELINE EQU '′'
 DEF NAMINGSCREEN_UNDERLINE  EQU '″'
@@ -82,9 +81,10 @@ NamingScreen:
 	ld [hl], '/'
 	farcall GetGender
 	jr c, .genderless
-	ld a, NAMINGSCREEN_MALE
+	ld a, '<MALE>'
 	jr nz, .place_gender
-	ld a, NAMINGSCREEN_FEMALE
+	assert '<MALE>' + 1 == '<FEMALE>'
+	inc a ; '<FEMALE>'
 .place_gender
 	hlcoord 1, 2
 	ld [hl], a
@@ -92,9 +92,11 @@ NamingScreen:
 	farcall GetShininess
 	jr z, .not_shiny
 	hlcoord 1, 4
-	ld [hl], '★'
+	ld [hl], '<SHINY>'
 .not_shiny
-	jmp .StoreMonIconParams
+	ld a, MON_NAME_LENGTH - 1
+	hlcoord 7, 4
+	jmp .StoreParams
 
 .Player:
 	farcall _GetPlayerIcon
@@ -108,45 +110,26 @@ NamingScreen:
 	ld c, [hl]
 	pop hl
 	call .LoadSprite
-	hlcoord 5, 2
 	ld de, .PlayerNameString
-	rst PlaceString
-	jmp .StoreSpriteIconParams
-
-.PlayerSpriteAnims:
-	table_width 1
-	db SPRITE_ANIM_INDEX_RED_WALK    ; PLAYER_MALE
-	db SPRITE_ANIM_INDEX_BLUE_WALK   ; PLAYER_FEMALE
-	db SPRITE_ANIM_INDEX_GREEN_WALK  ; PLAYER_ENBY
-	db SPRITE_ANIM_INDEX_PURPLE_WALK ; PLAYER_BETA
-	assert_table_length NUM_PLAYER_GENDERS
-
-.PlayerNameString:
-	db "Your name?@"
+	jr .PlaceNameAndStoreSpriteIconParams
 
 .Rival:
 	ld hl, RivalSpriteGFX
 	lb bc, BANK(RivalSpriteGFX), SPRITE_ANIM_INDEX_RED_WALK
 	call .LoadSprite
-	hlcoord 5, 2
 	ld de, .RivalNameString
-	rst PlaceString
-	jmp .StoreSpriteIconParams
-
-.RivalNameString:
-	db "Rival's name?@"
+	jr .PlaceNameAndStoreSpriteIconParams
 
 .TrendyPhrase:
 	ld hl, ArtistSpriteGFX
 	lb bc, BANK(ArtistSpriteGFX), SPRITE_ANIM_INDEX_BLUE_WALK
 	call .LoadSprite
-	hlcoord 5, 2
 	ld de, .TrendyPhraseString
+.PlaceNameAndStoreSpriteIconParams:
+	hlcoord 5, 2
 	rst PlaceString
-	jr .StoreSpriteIconParams
-
-.TrendyPhraseString:
-	db "What's trendy?@"
+	ld a, PLAYER_NAME_LENGTH - 1
+	jr .StoreParamsForShortName
 
 .Box:
 	ld de, vTiles0 tile $00
@@ -168,9 +151,6 @@ NamingScreen:
 	rst PlaceString
 	jr .StoreBoxIconParams
 
-.BoxNameString:
-	db "Box name?@"
-
 .LoadSprite:
 	push bc
 	ld de, vTiles0 tile $00
@@ -189,21 +169,11 @@ NamingScreen:
 	depixel 4, 4, 4, 0
 	jmp InitSpriteAnimStruct
 
-.StoreMonIconParams:
-	ld a, MON_NAME_LENGTH - 1
-	hlcoord 7, 4
-	jr .StoreParams
-
-.StoreSpriteIconParams:
-	ld a, PLAYER_NAME_LENGTH - 1
-	hlcoord 5, 4
-	jr .StoreParams
-
 .StoreBoxIconParams:
 	; the terminator isn't saved, so no "- 1" is needed.
 	ld a, BOX_NAME_LENGTH
+.StoreParamsForShortName:
 	hlcoord 5, 4
-
 .StoreParams:
 	ld [wNamingScreenMaxNameLength], a
 	ld a, l
@@ -211,6 +181,21 @@ NamingScreen:
 	ld a, h
 	ld [wNamingScreenStringEntryCoord + 1], a
 	ret
+
+.PlayerSpriteAnims:
+INCLUDE "data/player/sprite_anims.asm"
+
+.PlayerNameString:
+	db "Your name?@"
+
+.RivalNameString:
+	db "Rival's name?@"
+
+.TrendyPhraseString:
+	db "What's trendy?@"
+
+.BoxNameString:
+	db "Box name?@"
 
 NamingScreen_InitText:
 	call WaitTop
@@ -761,11 +746,9 @@ LoadNamingScreenGFX:
 	ld de, vTiles2 tile NAMINGSCREEN_BORDER
 	call Decompress
 
-	; Gender symbols
-	ld hl, BattleExtrasGFX
-	ld de, vTiles2 tile NAMINGSCREEN_MALE
-	lb bc, BANK(BattleExtrasGFX), 2
-	call DecompressRequest2bpp
+	; Gender symbols and shiny star
+	ld de, vTiles2 tile '<MALE>'
+	farcall CopyColoredMaleFemaleShinyTiles
 
 	ld de, vTiles0 tile NAMINGSCREEN_CURSOR
 	ld hl, NamingScreenGFX_Cursor

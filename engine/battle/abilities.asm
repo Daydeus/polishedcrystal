@@ -95,7 +95,6 @@ NotificationAbilities:
 	call StdBattleTextbox
 	jmp EndAbility
 
-
 ImmunityAbility:
 PastelVeilAbility:
 	ld a, 1 << PSN
@@ -1236,6 +1235,7 @@ SlushRushAbility:
 WeatherSpeedAbility:
 ; Doubles Speed in relevant weather
 	ln c, 2, 1 ; x2
+	call GetWeatherAfterUserUmbrella
 	jr WeatherBoostAbility
 
 SandVeilAbility:
@@ -1246,8 +1246,10 @@ SnowCloakAbility:
 WeatherAccAbility:
 ; Decrease target accuracy by 20% in relevant weather
 	ln c, 4, 5 ; x0.8
+	call GetSolarizedWeather
+	call nz, GetWeatherAfterOpponentUmbrella
+	; fallthrough
 WeatherBoostAbility:
-	call GetWeatherAfterOpponentUmbrella
 	cp b
 	ret nz
 	ld a, c
@@ -1274,7 +1276,7 @@ SolarPowerWeatherAbility:
 	call BeginAbility
 	call ShowAbilityActivation
 	call GetEighthMaxHP
-	predef SubtractHPFromUser
+	farcall SubtractHPFromUser
 	ld hl, IsHurtText
 	call StdBattleTextbox
 	jmp EndAbility
@@ -1611,7 +1613,7 @@ BadDreamsAbility:
 	call ShowAbilityActivation
 	call SwitchTurn
 	call GetEighthMaxHP
-	predef SubtractHPFromUser
+	farcall SubtractHPFromUser
 	call SwitchTurn
 	ld hl, IsTormentedText
 	call StdBattleTextbox
@@ -2093,10 +2095,9 @@ _GetIgnorableAbility:
 _GetAbilityFlags:
 ; return flags for ability in a.
 	push hl
-	ld hl, AbilityFlags
-	add l
+	add LOW(AbilityFlags)
 	ld l, a
-	adc h
+	adc HIGH(AbilityFlags)
 	sub l
 	ld h, a
 	ld a, [hl]
@@ -2115,7 +2116,16 @@ DisplayAbilitySwap:
 	call ShowAbilityReplacement
 	ld hl, SwappedAbilitiesText
 	call StdBattleTextbox
-	jr EndAbility
+	; fallthrough
+
+EndAbility:
+	ld a, [wInAbility]
+	and a
+	ret z
+	call DismissAbilityOverlays
+	xor a
+	ld [wInAbility], a
+	ret
 
 BeginAbility:
 	ld a, [wInAbility]
@@ -2129,15 +2139,6 @@ BeginAbility:
 	pop de
 	pop hl
 	ld a, 1
-	ld [wInAbility], a
-	ret
-
-EndAbility:
-	ld a, [wInAbility]
-	and a
-	ret z
-	call DismissAbilityOverlays
-	xor a
 	ld [wInAbility], a
 	ret
 

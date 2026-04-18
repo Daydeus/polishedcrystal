@@ -80,7 +80,7 @@ CheckHowToEvolve:
 	push hl
 	xor a
 	ld [wMonType], a
-	predef CopyPkmnToTempMon
+	farcall CopyPkmnToTempMon
 	pop hl
 
 .loop
@@ -443,7 +443,8 @@ TryToEvolve:
 	ld c, 40
 	call DelayFrames
 
-	call ClearTileMap
+	call ClearScreen
+	call ApplyAttrAndTilemapInVBlank
 	call UpdateSpeciesNameIfNotNicknamed
 	call GetBaseData
 
@@ -452,7 +453,7 @@ TryToEvolve:
 	farcall GetHyperTraining
 	inc a ; factor in EVs
 	ld b, a
-	predef CalcPkmnStats
+	farcall CalcPkmnStats
 
 	ld a, [wCurPartyMon]
 	ld hl, wPartyMons
@@ -627,7 +628,7 @@ LearnEvolutionMove:
 	call CopyName1
 	ld a, [wCurPartySpecies]
 	push af
-	predef LearnMove
+	farcall LearnMove
 	pop af
 	ld [wCurPartySpecies], a
 	ld [wTempSpecies], a
@@ -684,7 +685,7 @@ LearnLevelMoves:
 	call CopyName1
 	ld a, [wCurPartySpecies]
 	push af
-	predef LearnMove
+	farcall LearnMove
 	pop af
 	ld [wCurPartySpecies], a
 	ld [wTempSpecies], a
@@ -798,7 +799,7 @@ ShiftMoves:
 EvoFlagAction:
 	push de
 	ld d, $0
-	predef FlagPredef
+	farcall SmallFlagAction
 	pop de
 	ret
 

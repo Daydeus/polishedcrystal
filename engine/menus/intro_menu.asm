@@ -37,10 +37,10 @@ _MainMenu:
 NewGame_ClearTileMapEtc:
 	xor a
 	ldh [hMapAnims], a
-	ld a, '<BLACK>'
-	call FillTileMap
 	call LoadFrame
 	call LoadStandardFont
+	ld a, '<BLACK>'
+	call FillTileMap
 	jmp ClearWindowData
 
 NewGamePlus:
@@ -902,24 +902,24 @@ SoThisIsYouText:
 	text_end
 
 InitGenderGraphics:
-	ld hl, ChrisCardPic
+	ld hl, CalPic
 	ld de, vTiles2 tile $00
-	lb bc, BANK(ChrisCardPic), 5 * 7
-	call DecompressRequest2bpp
-	ld hl, KrisCardPic
+	ld b, BANK(CalPic)
+	call .DecompressRequestPicSlice
+	ld hl, CarriePic
 	ld de, vTiles2 tile $23
-	lb bc, BANK(KrisCardPic), 5 * 7
-	call DecompressRequest2bpp
-	ld hl, CrysCardPic
+	ld b, BANK(CarriePic)
+	call .DecompressRequestPicSlice
+	ld hl, JackyPic
 	ld de, vTiles2 tile $46
-	lb bc, BANK(CrysCardPic), 5 * 7
-	call DecompressRequest2bpp
+	ld b, BANK(JackyPic)
+	call .DecompressRequestPicSlice
 	ld a, 1
 	ldh [rVBK], a
-	ld hl, BetaCardPic
+	ld hl, EunaPic
 	ld de, vTiles5 tile $00
-	lb bc, BANK(BetaCardPic), 5 * 7
-	call DecompressRequest2bpp
+	ld b, BANK(EunaPic)
+	call .DecompressRequestPicSlice
 	xor a
 	ldh [rVBK], a
 
@@ -927,22 +927,30 @@ InitGenderGraphics:
 	ldh [hGraphicStartTile], a
 	hlcoord 0, 4
 	lb bc, 5, 7
-	predef PlaceGraphic
+	farcall PlaceGraphic
 	ld a, $23
 	ldh [hGraphicStartTile], a
 	hlcoord 5, 4
 	lb bc, 5, 7
-	predef PlaceGraphic
+	farcall PlaceGraphic
 	ld a, $46
 	ldh [hGraphicStartTile], a
 	hlcoord 10, 4
 	lb bc, 5, 7
-	predef PlaceGraphic
+	farcall PlaceGraphic
 	xor a
 	ldh [hGraphicStartTile], a
 	hlcoord 15, 4
 	lb bc, 5, 7
-	predef_jump PlaceGraphic
+	farjp PlaceGraphic
+
+.DecompressRequestPicSlice:
+	push de
+	call FarDecompressWRA6InB
+	pop hl
+	ld de, wDecompressScratch tile $07
+	ld c, 5 * 7
+	jmp Request2bppInWRA6
 
 NamePlayer:
 	ld b, $1 ; player
@@ -1054,7 +1062,7 @@ FinishPrepIntroPic:
 	ldh [hGraphicStartTile], a
 	hlcoord 6, 4
 	lb bc, 7, 7
-	predef_jump PlaceGraphic
+	farjp PlaceGraphic
 
 Intro_PlacePlayerSprite:
 	farcall GetPlayerIcon
@@ -1381,7 +1389,7 @@ Copyright:
 	call LoadFrame
 	ld hl, CopyrightGFX
 	ld de, vTiles2 tile $60
-	lb bc, BANK(CopyrightGFX), $1d
+	lb bc, BANK(CopyrightGFX), $1e
 	call DecompressRequest2bpp
 	hlcoord 2, 7
 	ld de, CopyrightString
@@ -1389,16 +1397,4 @@ Copyright:
 	ret
 
 CopyrightString:
-	; ©1995-2001 Nintendo
-	db $60, $61, $62, $63, $64, $65, $66
-	db $67, $68, $69, $6a, $6b, $6c
-
-	; ©1995-2001 Creatures inc.
-	db "<NEXT>"
-	db $60, $61, $62, $63, $64, $65, $66
-	db $6d, $6e, $6f, $70, $71, $72, $7a, $7b, $7c
-
-	; ©1995-2001 GAME FREAK inc.
-	db "<NEXT>"
-	db $60, $61, $62, $63, $64, $65, $66
-	db $73, $74, $75, $76, $77, $78, $79, $7a, $7b, $7c, "@"
+INCLUDE "data/copyright.asm"

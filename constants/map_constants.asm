@@ -116,7 +116,7 @@ ENDM
 	map_const ICE_PATH_B2F_MAHOGANY_SIDE,                 10,  9 ; 54
 	map_const ICE_PATH_B2F_BLACKTHORN_SIDE,                5,  9 ; 55
 	map_const ICE_PATH_B3F,                               10,  5 ; 56
-	map_const WHIRL_ISLAND_NW,                            17, 18 ; 57
+	map_const WHIRL_ISLAND_NW,                             5,  9 ; 57
 	map_const WHIRL_ISLAND_NE,                            10,  9 ; 58
 	map_const WHIRL_ISLAND_SW,                            10,  9 ; 59
 	map_const WHIRL_ISLAND_CAVE,                           5,  8 ; 60
@@ -127,14 +127,14 @@ ENDM
 	map_const SILVER_CAVE_ROOM_1,                         10, 18 ; 65
 	map_const SILVER_CAVE_ROOM_2,                         15, 17 ; 66
 	map_const SILVER_CAVE_ROOM_3,                          8, 16 ; 67
-	map_const SILVER_CAVE_ITEM_ROOMS,                     20, 18 ; 68
+	map_const SILVER_CAVE_ITEM_ROOMS,                     13,  7 ; 68
 	map_const DARK_CAVE_VIOLET_ENTRANCE,                  20, 18 ; 69
 	map_const DARK_CAVE_BLACKTHORN_ENTRANCE,              15, 15 ; 70
 	map_const DRAGONS_DEN_1F,                             10,  4 ; 71
 	map_const DRAGONS_DEN_B1F,                            20, 18 ; 72
 	map_const DRAGON_SHRINE,                               5,  5 ; 73
 	map_const TOHJO_FALLS,                                15,  9 ; 74
-	map_const GIOVANNIS_CAVE,                             10, 24 ; 75
+	map_const GIOVANNIS_CAVE,                              5,  5 ; 75
 	map_const DIGLETTS_CAVE,                              21, 19 ; 76
 	map_const MOUNT_MOON_1F,                              15, 13 ; 77
 	map_const MOUNT_MOON_B1F,                             16, 14 ; 78
@@ -180,7 +180,7 @@ ENDM
 
 	newgroup                                                     ;  6
 	map_const CINNABAR_POKECENTER_1F,                      6,  4 ;  1
-	map_const SEAFOAM_ISLANDS_1F,                         17, 18 ;  2
+	map_const SEAFOAM_ISLANDS_1F,                          5, 10 ;  2
 	map_const SEAFOAM_GYM,                                12, 12 ;  3
 	map_const SEAFOAM_ISLANDS_B1F,                        20, 10 ;  4
 	map_const SEAFOAM_ISLANDS_B2F,                        20, 10 ;  5
@@ -249,7 +249,7 @@ ENDM
 	map_const ROUTE_32_COAST,                             15, 35 ;  2
 	map_const VIOLET_CITY,                                20, 18 ;  3
 	map_const VIOLET_MART,                                 6,  4 ;  4
-	map_const VIOLET_GYM,                                  5,  8 ;  5
+	map_const VIOLET_GYM,                                  5,  9 ;  5
 	map_const EARLS_POKEMON_ACADEMY,                       4,  8 ;  6
 	map_const VIOLET_NICKNAME_SPEECH_HOUSE,                4,  4 ;  7
 	map_const VIOLET_POKECENTER_1F,                        6,  4 ;  8
@@ -286,7 +286,7 @@ ENDM
 	map_const GOLDENROD_DEPT_STORE_ROOF,                   8,  6 ; 22
 	map_const GOLDENROD_GAME_CORNER,                      10,  7 ; 23
 	map_const GOLDENROD_POKECOM_CENTER_1F,                16,  8 ; 24
-	map_const GOLDENROD_POKECOM_CENTER_OFFICE,             6,  5 ; 25
+	map_const GOLDENROD_POKECOM_CENTER_OFFICE,             8,  5 ; 25
 	map_const ILEX_FOREST_AZALEA_GATE,                     5,  4 ; 26
 	map_const ROUTE_34_ILEX_FOREST_GATE,                   5,  4 ; 27
 	map_const ROUTE_35_GOLDENROD_GATE,                     5,  4 ; 28
@@ -563,9 +563,9 @@ ENDM
 	map_const SAFFRON_POKECENTER_1F,                       6,  4 ;  4
 	map_const MR_PSYCHICS_HOUSE,                           4,  4 ;  5
 	map_const SAFFRON_TRAIN_STATION,                      10,  9 ;  6
-	map_const SILPH_CO_1F,                                 8,  4 ;  7
-	map_const SILPH_CO_2F,                                 8,  4 ;  8
-	map_const SILPH_CO_3F,                                 8,  4 ;  9
+	map_const SILPH_CO_1F,                                 8,  5 ;  7
+	map_const SILPH_CO_2F,                                 8,  5 ;  8
+	map_const SILPH_CO_3F,                                 8,  5 ;  9
 	map_const COPYCATS_HOUSE_1F,                           4,  4 ; 10
 	map_const COPYCATS_HOUSE_2F,                           4,  3 ; 11
 	map_const ROUTE_5,                                    10, 17 ; 12
@@ -606,13 +606,13 @@ ENDM
 	map_const ROUTE_9,                                    26,  9 ;  1
 	map_const ROUTE_10_NORTH,                             10, 29 ;  2
 	map_const DIM_CAVE_1F,                                17, 18 ;  3
-	map_const DIM_CAVE_2F,                                17, 18 ;  4
+	map_const DIM_CAVE_2F,                                17, 16 ;  4
 	map_const DIM_CAVE_3F,                                16, 17 ;  5
 	map_const DIM_CAVE_4F,                                16, 16 ;  6
 	map_const DIM_CAVE_5F,                                17, 17 ;  7
 
 	newgroup                                                     ; 29
-	map_const GOLDENROD_HARBOR,                           23, 18 ;  1
+	map_const GOLDENROD_HARBOR,                           22, 18 ;  1
 	map_const GOLDENROD_HARBOR_GATE,                       5,  4 ;  2
 
 	newgroup                                                     ; 30
@@ -686,7 +686,7 @@ ENDM
 	map_const VALENCIA_PORT,                              11,  9 ;  6
 
 	newgroup                                                     ; 34
-	map_const SINJOH_RUINS,                                9, 13 ;  1
+	map_const SINJOH_RUINS,                                9, 11 ;  1
 	map_const SINJOH_RUINS_HOUSE,                          4,  4 ;  2
 	map_const MYSTRI_STAGE,                                7, 10 ;  3
 	map_const EMBEDDED_TOWER,                              7, 12 ;  4
