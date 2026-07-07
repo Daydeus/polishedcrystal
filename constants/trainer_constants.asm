@@ -514,6 +514,7 @@ DEF BETA EQU __trainer_class__
 	const JAY
 	const OLEG
 	const TALA
+	const CYD
 
 	trainerclass JUGGLER
 	const IRWIN1
@@ -886,9 +887,9 @@ DEF BETA EQU __trainer_class__
 	const JACLYN
 
 	trainerclass BIKER
-	const DWAYNE
-	const HARRIS
-	const ZEKE
+	const DWAYNE ; custom pal
+	const HARRIS ; custom pal
+	const ZEKE ; custom pal
 	const CHARLES
 	const REILLY
 	const JOEL
@@ -1127,6 +1128,8 @@ DEF BETA EQU __trainer_class__
 
 	trainerclass REI
 
+	trainerclass FIREBREATHER_ASHES
+
 DEF NUM_TRAINER_CLASSES EQU __trainer_class__ - 1
 
 	trainerclass OMASTAR_FOSSIL
@@ -1158,13 +1161,18 @@ ENDM
 	trainerpal KUNI
 	trainerpal MIKI
 	trainerpal MAKO
-	trainerpal AMI  ; 06
+	trainerpal AMI
 	trainerpal MINA
 
 ; elders (wise trio)
 	trainerpal GAKU
 	trainerpal MASA
 	trainerpal KOJI
+
+; bikers (kanto pokemon federation)
+	trainerpal BIKER_DWAYNE
+	trainerpal BIKER_HARRIS
+	trainerpal BIKER_ZEKE
 
 ; dark-skinned or tanned trainers
 	trainerpal DARK_CAMPER

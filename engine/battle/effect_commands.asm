@@ -581,7 +581,6 @@ CheckPowerHerb:
 
 	; check for solarization
 	call GetSolarizedWeather
-	cp WEATHER_SUN
 	jr nz, .no_solar_beam
 
 	farcall BeginAbility
@@ -1858,18 +1857,14 @@ _CheckTypeMatchup:
 	ret
 
 BattleCommand_checkpowder:
-	ld a, BATTLE_VARS_MOVE_ANIM
-	call GetBattleVar
-	cp SING
-	jr nz, .not_sing
 	farcall CheckNullificationAbilities
 	ld a, [wTypeMatchup]
 	and a
-	ret nz
+	jr nz, .no_nullification
 	ld [wTypeModifier], a
 	ret
 
-.not_sing
+.no_nullification
 	cp THUNDER_WAVE
 	jr z, BattleCommand_resettypematchup
 	cp TOXIC
@@ -2680,6 +2675,10 @@ BattleCommand_applydamage:
 ; 3 - Nonconsumable item (i.e. Focus Band)
 ; 4 - Item consumed after use (i.e. Focus Sash)
 ; 5 - High Affection
+	call ResetSubHit
+	call CheckSubstituteOpp
+	call nz, SetSubHit
+
 	ld a, BATTLE_VARS_SUBSTATUS1_OPP
 	call GetBattleVar
 	bit SUBSTATUS_ENDURE, a
@@ -2734,7 +2733,6 @@ BattleCommand_applydamage:
 	ld b, $0
 .okay
 	push bc
-	ld c, $0
 	call TakeDamage
 	call .damage_taken
 	pop bc
@@ -4733,7 +4731,6 @@ TakeOpponentDamage:
 
 TakeDamage:
 ; opponent takes damage
-	call ResetSubHit
 	ld hl, wCurDamage
 	ld a, [hli]
 	ld b, a
@@ -4741,11 +4738,7 @@ TakeDamage:
 	or b
 	jr z, .did_no_damage
 
-	ld a, c
-	and a
-	jr nz, .mimic_sub_check
-
-	call CheckSubstituteOpp
+	call CheckSubHit
 	jr nz, SelfInflictDamageToSubstitute
 .mimic_sub_check
 	ld a, [hld]
@@ -4756,7 +4749,6 @@ TakeDamage:
 	jmp RefreshBattleHuds
 
 SelfInflictDamageToSubstitute:
-	call SetSubHit
 	ld hl, SubTookDamageText
 	call StdBattleTextbox
 
@@ -5859,19 +5851,13 @@ BattleCommand_charge:
 
 .SolarBeam:
 ; 'took in sunlight!'
-	text_far _BattleTookSunlightText
-	text_end
-
+	text_farend _BattleTookSunlightText
 .Fly:
 ; 'flew up high!'
-	text_far _BattleFlewText
-	text_end
-
+	text_farend _BattleFlewText
 .Dig:
 ; 'dug a hole!'
-	text_far _BattleDugText
-	text_end
-
+	text_farend _BattleDugText
 BattleCommand_traptarget:
 	call HasOpponentFainted
 	ret z
@@ -5890,19 +5876,29 @@ BattleCommand_traptarget:
 	ld a, [hl]
 	and a
 	ret nz
-	call CheckSubstituteOpp
+	call CheckSubHit
 	ret nz
-	ld a, HELD_PROLONG_WRAP
-	call GetItemBoostedDuration
+	push hl
+	call GetUserItemAfterUnnerve
+	pop hl
+	ld a, b
+	cp HELD_PROLONG_WRAP
+	ld a, c
 	jr z, .got_count
 	call BattleRandom
 	and 1
 	add 4
-	jr .got_count
-.seven_turns
-	ld a, 7
 .got_count
 	ld [hl], a
+
+	; Because the state of Binding Band depends on the item when we attacked,
+	; not the current item, store the Binding Band flag as the 4th bit in
+	; the wrap count.
+	ld a, b
+	cp HELD_BINDING_BAND
+	jr nz, .binding_band_done
+	set 3, [hl]
+.binding_band_done
 	ld a, BATTLE_VARS_MOVE_ANIM
 	call GetBattleVar
 	ld [de], a

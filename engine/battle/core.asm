@@ -97,7 +97,7 @@ DoBattle:
 .not_linked_2
 	call AutomaticBattleWeather
 	call SpikesDamageBoth ; for Air Balloon
-	call BoostGiovannisArmoredMewtwo
+	call CustomTrainerActions
 	call RunBothEntryAbilities
 	jr BattleTurn
 
@@ -710,7 +710,7 @@ PerformMove:
 	call GetBattleVarAddr
 	res SUBSTATUS_IN_ABILITY, [hl]
 
-	farcall TickDisableAfterMove
+	farcall TickDisableAndEncoreAfterMove
 
 	ld a, BATTLE_VARS_SUBSTATUS1_OPP
 	call GetBattleVarAddr
@@ -2566,7 +2566,7 @@ SelectBattleMon:
 
 PickPartyMonInBattle:
 .loop
-	ld a, $2 ; Which PKMN?
+	ld a, PARTYMENUACTION_SWITCH
 	ld [wPartyMenuActionText], a
 	call JumpToPartyMenuAndPrintText
 	call SelectBattleMon
@@ -4531,7 +4531,7 @@ BattleMenuPKMN_ReturnFromStats:
 	call ClearBGPalettes
 BattleMenuPKMN_Loop:
 	call SetUpBattlePartyMenu
-	xor a
+	xor a ; PARTYMENUACTION_CHOOSE_POKEMON
 	ld [wPartyMenuActionText], a
 	call JumpToPartyMenuAndPrintText
 	call SelectBattleMon
@@ -7167,13 +7167,9 @@ Text_PkmnGainedExpPoint:
 	ret
 
 TextJump_ABoostedStringBuffer2ExpPoints:
-	text_far Text_ABoostedStringBuffer2ExpPoints
-	text_end
-
+	text_farend Text_ABoostedStringBuffer2ExpPoints
 TextJump_StringBuffer2ExpPoints:
-	text_far Text_StringBuffer2ExpPoints
-	text_end
-
+	text_farend Text_StringBuffer2ExpPoints
 AnimateExpBar:
 	push bc
 
@@ -7624,9 +7620,7 @@ Function_TextJump_BattleMonNick01:
 	ret
 
 TextJump_BattleMonNick01:
-	text_far Text_BattleMonNick01
-	text_end
-
+	text_farend Text_BattleMonNick01
 WithdrawPkmnText:
 	ld hl, .WithdrawPkmnText
 	jmp BattleTextbox
@@ -7683,21 +7677,13 @@ WithdrawPkmnText:
 	ret
 
 TextJump_ThatsEnoughComeBack:
-	text_far Text_ThatsEnoughComeBack
-	text_end
-
+	text_farend Text_ThatsEnoughComeBack
 TextJump_OKComeBack:
-	text_far Text_OKComeBack
-	text_end
-
+	text_farend Text_OKComeBack
 TextJump_GoodComeBack:
-	text_far Text_GoodComeBack
-	text_end
-
+	text_farend Text_GoodComeBack
 TextJump_ComeBack:
-	text_far Text_ComeBack
-	text_end
-
+	text_farend Text_ComeBack
 HandleSafariAngerEatingStatus:
 	ld hl, wSafariMonEating
 	ld a, [hl]
@@ -7973,7 +7959,6 @@ BattleIntro:
 	xor a
 	ld [wTempBattleMonSpecies], a
 	ld [wBattleMenuCursorBuffer], a
-	xor a
 	ldh [hMapAnims], a
 	ld a, [wOtherTrainerClass]
 	cp LYRA2
@@ -8963,10 +8948,21 @@ AutomaticBattleWeather:
 	call StdBattleTextbox
 	jmp EmptyBattleTextbox
 
-BoostGiovannisArmoredMewtwo:
+CustomTrainerActions:
 	ld a, [wOtherTrainerClass]
 	cp GIOVANNI
+	jr z, .maybe_giovanni_armored_mewtwo
+	cp FIREBREATHER
 	ret nz
+	ld a, [wOtherTrainerID]
+	cp DICK
+	ret nz
+	ld a, FIREBREATHER_ASHES
+	ld [wOtherTrainerClass], a
+	ld [wTrainerClass], a
+	ret
+
+.maybe_giovanni_armored_mewtwo
 	ld a, [wOtherTrainerID]
 	cp GIOVANNI1
 	ret nz

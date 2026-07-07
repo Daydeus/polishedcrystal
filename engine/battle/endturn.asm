@@ -694,22 +694,29 @@ HandleWrap:
 	and a
 	ret z
 
-	ld a, BATTLE_VARS_SUBSTATUS4
-	call GetBattleVar
-	bit SUBSTATUS_SUBSTITUTE, a
-	ret nz
-
 	push de
 	ld a, [de]
 	ld [wFXAnimIDLo], a
 	dec [hl]
+	ld a, [hl]
+	and %111
+	jr nz, .still_wrapped
+
+	ld [hl], a
 	ld hl, BattleText_UserWasReleasedFromStringBuffer1
 	jr z, .print_text
 
+.still_wrapped
+	push hl
 	ld a, BATTLE_VARS_SUBSTATUS3
 	call GetBattleVar
 	and 1 << SUBSTATUS_FLYING | 1 << SUBSTATUS_UNDERGROUND
 	jr nz, .skip_anim
+	ld a, BATTLE_VARS_SUBSTATUS4
+	call GetBattleVar
+	bit SUBSTATUS_SUBSTITUTE, a
+	jr nz, .skip_anim
+
 	call SwitchTurn
 	xor a
 	ld [wNumHits], a
@@ -718,10 +725,9 @@ HandleWrap:
 	call SwitchTurn
 
 .skip_anim
-	farcall GetOpponentItemAfterUnnerve
-	ld a, b
-	cp HELD_BINDING_BAND
-	jr nz, .no_binding_band
+	pop hl
+	bit 3, [hl]
+	jr z, .no_binding_band
 	call GetSixthMaxHP
 	jr .subtract_hp
 .no_binding_band
@@ -804,20 +810,28 @@ EndturnEncoreDisable_End:
 	ld l, e
 	jmp StdBattleTextbox
 
-TickDisableAfterMove:
-; If we have 5 turns left of Disable, tick it down. This makes it so that
-; Disable covers 4 move uses.
+TickDisableAndEncoreAfterMove:
+; If we have 5 turns left of Disable or 4 turns left of Encore, tick it down.
+; This makes it so that Disable covers 4 move uses and Encore 3.
 	call HasUserFainted
 	ret z
 	ldh a, [hBattleTurn]
 	and a
 	ld hl, wPlayerDisableCount
-	jr z, .got_disable_count
+	ld de, wPlayerEncoreCount
+	jr z, .got_count
 	ld hl, wEnemyDisableCount
-.got_disable_count
-	ld a, [hl]
+	ld de, wEnemyEncoreCount
+.got_count
+	ld a, 5
+	call .MaybeDecrement
+	ld a, 4
+	ld h, d
+	ld l, e
+
+.MaybeDecrement:
+	sub [hl]
 	and $f
-	cp 5
 	ret nz
 	dec [hl]
 	ret

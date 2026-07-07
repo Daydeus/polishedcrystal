@@ -158,17 +158,17 @@ ENDM
 
 MACRO strengthboulder_event
 	if _NARG == 2
-		object_event \1, \2, SPRITE_BOULDER_ROCK_FOSSIL, SPRITEMOVEDATA_STRENGTH_BOULDER, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumpstd, strengthboulder, -1
+		object_event \1, \2, SPRITE_BOULDER_ROCK, SPRITEMOVEDATA_STRENGTH_BOULDER, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumpstd, strengthboulder, -1
 	else
-		object_event \1, \2, SPRITE_BOULDER_ROCK_FOSSIL, SPRITEMOVEDATA_STRENGTH_BOULDER, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumpstd, strengthboulder, \3
+		object_event \1, \2, SPRITE_BOULDER_ROCK, SPRITEMOVEDATA_STRENGTH_BOULDER, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumpstd, strengthboulder, \3
 	endc
 ENDM
 
 MACRO smashrock_event
 	if _NARG == 2
-		object_event \1, \2, SPRITE_BOULDER_ROCK_FOSSIL, SPRITEMOVEDATA_SMASHABLE_ROCK, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumpstd, smashrock, 0, -1
+		object_event \1, \2, SPRITE_BOULDER_ROCK, SPRITEMOVEDATA_SMASHABLE_ROCK, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumpstd, smashrock, 0, -1
 	else
-		object_event \1, \2, SPRITE_BOULDER_ROCK_FOSSIL, SPRITEMOVEDATA_SMASHABLE_ROCK, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumpstd, smashrock, 0, \3
+		object_event \1, \2, SPRITE_BOULDER_ROCK, SPRITEMOVEDATA_SMASHABLE_ROCK, 0, 0, -1, 0, OBJECTTYPE_COMMAND, jumpstd, smashrock, 0, \3
 	endc
 ENDM
 
@@ -236,6 +236,10 @@ MACRO connection
 	endc
 
 	if "\1" === "north"
+		if MAP_CONNECTIONS_{CURRENT_MAP_ID} != -1 && MAP_CONNECTIONS_{CURRENT_MAP_ID} & (NORTH | SOUTH | WEST | EAST)
+			fail "Invalid order for 'connection' (must be north, south, west, east)"
+		endc
+		DEF MAP_CONNECTIONS_{CURRENT_MAP_ID} |= NORTH
 		DEF _blk = \3_WIDTH * (\3_HEIGHT - 3) + _src
 		DEF _map = _tgt
 		DEF _win = (\3_WIDTH + 6) * \3_HEIGHT + 1
@@ -247,6 +251,10 @@ MACRO connection
 		endc
 
 	elif "\1" === "south"
+		if MAP_CONNECTIONS_{CURRENT_MAP_ID} != -1 && MAP_CONNECTIONS_{CURRENT_MAP_ID} & (SOUTH | WEST | EAST)
+			fail "Invalid order for 'connection' (must be north, south, west, east)"
+		endc
+		DEF MAP_CONNECTIONS_{CURRENT_MAP_ID} |= SOUTH
 		DEF _blk = _src
 		DEF _map = (CURRENT_MAP_WIDTH + 6) * (CURRENT_MAP_HEIGHT + 3) + _tgt
 		DEF _win = \3_WIDTH + 7
@@ -258,6 +266,10 @@ MACRO connection
 		endc
 
 	elif "\1" === "west"
+		if MAP_CONNECTIONS_{CURRENT_MAP_ID} != -1 && MAP_CONNECTIONS_{CURRENT_MAP_ID} & (WEST | EAST)
+			fail "Invalid order for 'connection' (must be north, south, west, east)"
+		endc
+		DEF MAP_CONNECTIONS_{CURRENT_MAP_ID} |= WEST
 		DEF _blk = (\3_WIDTH * _src) + \3_WIDTH - 3
 		DEF _map = (CURRENT_MAP_WIDTH + 6) * _tgt
 		DEF _win = (\3_WIDTH + 6) * 2 - 6
@@ -269,6 +281,10 @@ MACRO connection
 		endc
 
 	elif "\1" === "east"
+		if MAP_CONNECTIONS_{CURRENT_MAP_ID} != -1 && MAP_CONNECTIONS_{CURRENT_MAP_ID} & EAST
+			fail "Invalid order for 'connection' (must be north, south, west, east)"
+		endc
+		DEF MAP_CONNECTIONS_{CURRENT_MAP_ID} |= EAST
 		DEF _blk = (\3_WIDTH * _src)
 		DEF _map = (CURRENT_MAP_WIDTH + 6) * _tgt + CURRENT_MAP_WIDTH + 3
 		DEF _win = \3_WIDTH + 7

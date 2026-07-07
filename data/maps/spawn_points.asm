@@ -12,7 +12,7 @@ SpawnPoints:
 
 	spawn PALLET_TOWN,                 5,  6
 	spawn VIRIDIAN_CITY,              23, 26
-	spawn PEWTER_CITY,                13, 26
+	spawn PEWTER_CITY,                13, 28
 	spawn ROUTE_3,                    61,  4
 	spawn CERULEAN_CITY,              19, 18
 	spawn CERULEAN_CAPE,               9,  6
@@ -24,7 +24,7 @@ SpawnPoints:
 	spawn FUCHSIA_CITY,               19, 28
 	spawn CINNABAR_ISLAND,            11, 16
 	spawn INDIGO_PLATEAU,             11,  6
-	spawn ROUTE_26,                    7,  6
+	spawn ROUTE_26,                    8,  6
 
 	spawn NEW_BARK_TOWN,              15,  6
 	spawn CHERRYGROVE_CITY,           29,  4
@@ -35,7 +35,7 @@ SpawnPoints:
 	spawn GOLDENROD_CITY,             18, 28
 	spawn OLIVINE_CITY,               13, 18
 	spawn ECRUTEAK_CITY,              23, 28
-	spawn SNOWTOP_MOUNTAIN_OUTSIDE,   17, 34
+	spawn SNOWTOP_MOUNTAIN_OUTSIDE,   17, 28
 	spawn MAHOGANY_TOWN,              15, 14
 	spawn ROUTE_48,                   11,  6
 	spawn LAKE_OF_RAGE,               21, 29

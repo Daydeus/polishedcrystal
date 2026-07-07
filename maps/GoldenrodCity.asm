@@ -1,6 +1,6 @@
 GoldenrodCity_MapScriptHeader:
 	def_scene_scripts
-	scene_script GoldenrodCityRocketTakeoverScene, SCENE_GOLDENRODCITY_ROCKET_TAKEOVER
+	scene_script GoldenrodCityStepDownScene, SCENE_GOLDENRODCITY_STEP_DOWN
 	scene_const SCENE_GOLDENRODCITY_NOOP
 
 	def_callbacks
@@ -25,17 +25,20 @@ GoldenrodCity_MapScriptHeader:
 	warp_event 18, 27, GOLDENROD_POKECOM_CENTER_1F, 2
 	warp_event  4, 16, GOLDENROD_HARBOR_GATE, 3
 	warp_event  4, 17, GOLDENROD_HARBOR_GATE, 4
-	warp_event 30, 15, GOLDENROD_MUSEUM_1F, 2
+	warp_event 30, 15, GOLDENROD_MUSEUM_1F, 1
 	warp_event 37, 19, GOLDENROD_NET_BALL_HOUSE, 1
 	warp_event 33, 23, GOLDENROD_BAND_HOUSE, 1
 	warp_event 13, 21, GOLDENROD_HONEY_HOUSE, 1
 	warp_event 39, 27, GOLDENROD_UNDERGROUND_ENTRANCES, 8
+	warp_event 19, 21, GOLDENROD_GAME_CORNER, 2
+	warp_event 29, 27, GOLDENROD_DEPT_STORE_1F, 2
+	warp_event 31, 15, GOLDENROD_MUSEUM_1F, 2
 
 	def_coord_events
 	coord_event  9, 15, SCENE_GOLDENRODCITY_NOOP, GoldenrodCityPanUpScript
 
 	def_bg_events
-	bg_event 14, 14, BGEVENT_JUMPTEXT, GoldenrodCityStationSignText
+	bg_event 15, 14, BGEVENT_JUMPTEXT, GoldenrodCityStationSignText
 	bg_event  7, 15, BGEVENT_JUMPTEXT, GoldenrodCityRadioTowerSignText
 	bg_event 30, 27, BGEVENT_JUMPTEXT, GoldenrodDeptStoreSignText
 	bg_event 30,  9, BGEVENT_JUMPTEXT, GoldenrodGymSignText
@@ -88,15 +91,15 @@ GoldenrodCityMoveTutor:
 	disappear GOLDENRODCITY_POKEFAN_M2
 	endcallback
 
-GoldenrodCityRocketTakeoverScene:
-	sdefer GoldenrodCityStepDownScript
+GoldenrodCityStepDownScene:
+	sdefer .Script
 	end
 
-GoldenrodCityStepDownScript:
-	readvar VAR_YCOORD
-	ifnotequal $f, .Done
+.Script:
 	readvar VAR_XCOORD
-	ifnotequal $9, .Done
+	ifnotequal 9, .Done
+	readvar VAR_YCOORD
+	ifnotequal 15, .Done
 	applyonemovement PLAYER, step_down
 .Done
 	setscene SCENE_GOLDENRODCITY_NOOP
@@ -112,7 +115,7 @@ GoldenrodCityPanUpScript:
 	special Special_FadeOutMusic
 	special FadeOutPalettes
 	pause 15
-	setscene SCENE_GOLDENRODCITY_ROCKET_TAKEOVER
+	setscene SCENE_GOLDENRODCITY_STEP_DOWN
 	warpfacing UP, RADIO_TOWER_1F, 2, 7
 	end
 
@@ -535,4 +538,3 @@ GoldenrodCityMoveTutorIfYouUnderstandYouveMadeItText:
 GoldenrodCityMoveTutorBButText:
 	text "B-but…"
 	done
-

@@ -127,7 +127,7 @@ struct Symbol *parse_symbols(const char *filename) {
 		if (c == EOF || c == '\n' || c == '\r' || c == ';' || (state == SYM_NAME && (c == ' ' || c == '\t'))) {
 			if (state == SYM_NAME) {
 				// The symbol name has ended; append the buffered symbol
-				buffer_append(buffer, &(char []){'\0'});
+				buffer_append(buffer, &(char){'\0'});
 				symbol_append(&symbols, buffer->data, bank, address);
 			}
 			// Skip to the next line, ignoring anything after the symbol value and name
@@ -143,19 +143,19 @@ struct Symbol *parse_symbols(const char *filename) {
 				// The symbol value or name has started; buffer its contents
 				if (++state == SYM_NAME) {
 					// The symbol name has started; parse the buffered value
-					buffer_append(buffer, &(char []){'\0'});
+					buffer_append(buffer, &(char){'\0'});
 					parse_symbol_value(buffer->data, &bank, &address);
 				}
 				buffer->size = 0;
 			}
-			buffer_append(buffer, &c);
+			buffer_append(buffer, &(char){c});
 		} else if (state == SYM_VALUE) {
 			// The symbol value has ended; wait to see if a name comes after it
 			state = SYM_SPACE;
 		}
 	}
 
-	fclose(file);
+	xfclose(file);
 	buffer_free(buffer);
 	return symbols;
 }
@@ -183,6 +183,16 @@ int parse_arg_value(const char *arg, bool absolute, const struct Symbol *symbols
 		return parse_number(arg, 0);
 	}
 
+	// Symbols may take the low or high part
+	enum { SYM_WHOLE, SYM_LOW, SYM_HIGH } part = SYM_WHOLE;
+	if (arg[0] == '<') {
+		part = SYM_LOW;
+		arg++;
+	} else if (arg[0] == '>') {
+		part = SYM_HIGH;
+		arg++;
+	}
+
 	// Symbols evaluate to their offset or address, plus an optional offset mod
 	int offset_mod = 0;
 	char *plus = strchr(arg, '+');
@@ -190,9 +200,13 @@ int parse_arg_value(const char *arg, bool absolute, const struct Symbol *symbols
 		offset_mod = parse_number(plus, 0);
 		*plus = '\0';
 	}
+
+	// Symbols evaluate to their offset or address
 	const char *sym_name = !strcmp(arg, "@") ? patch_name : arg; // "@" is the current patch label
 	const struct Symbol *symbol = symbol_find(symbols, sym_name);
-	return (absolute ? symbol->offset : symbol->address) + offset_mod;
+
+	int value = (absolute ? symbol->offset : symbol->address) + offset_mod;
+	return part == SYM_LOW ? value & 0xff : part == SYM_HIGH ? value >> 8 : value;
 }
 
 void interpret_command(char *command, const struct Symbol *current_hook, const struct Symbol *symbols, struct Buffer *patches, FILE *restrict new_rom, FILE *restrict orig_rom, FILE *restrict output) {
@@ -214,7 +228,8 @@ void interpret_command(char *command, const struct Symbol *current_hook, const s
 	}
 
 	// Get the arguments
-	char *argv[argc]; // VLA
+	char *argv[argc + 1]; // VLA (cannot be zero-length)
+	argv[argc] = NULL;
 	char *arg = command;
 	for (int i = 0; i < argc; i++) {
 		while (*arg && !isspace((unsigned)*arg)) {
@@ -359,9 +374,9 @@ struct Buffer *process_template(const char *template_filename, const char *patch
 			// "{...}" is a template command; buffer its contents
 			buffer->size = 0;
 			for (c = getc(input); c != EOF && c != '}'; c = getc(input)) {
-				buffer_append(buffer, &c);
+				buffer_append(buffer, &(char){c});
 			}
-			buffer_append(buffer, &(char []){'\0'});
+			buffer_append(buffer, &(char){'\0'});
 			// Interpret the command in the context of the current patch
 			interpret_command(buffer->data, current_hook, symbols, patches, new_rom, orig_rom, output);
 			break;
@@ -387,10 +402,10 @@ struct Buffer *process_template(const char *template_filename, const char *patch
 							c = '_';
 						}
 					}
-					buffer_append(buffer, &c);
+					buffer_append(buffer, &(char){c});
 				}
 			}
-			buffer_append(buffer, &(char []){'\0'});
+			buffer_append(buffer, &(char){'\0'});
 			// The current patch should have a corresponding ".VC_" label
 			current_hook = symbol_find_cat(symbols, ".VC_", buffer->data);
 			skip_to_next_line(input, output);
@@ -404,8 +419,8 @@ struct Buffer *process_template(const char *template_filename, const char *patch
 	rewind(orig_rom);
 	rewind(new_rom);
 
-	fclose(input);
-	fclose(output);
+	xfclose(input);
+	xfclose(output);
 	buffer_free(buffer);
 	return patches;
 }
@@ -453,6 +468,9 @@ int main(int argc, char *argv[]) {
 
 	FILE *new_rom = xfopen(argv[2], 'r');
 	FILE *orig_rom = xfopen(argv[3], 'r');
+	if (new_rom == stdin || orig_rom == stdin) {
+		error_exit("Error: Cannot read ROM file from stdin (not rewindable)\n");
+	}
 	struct Buffer *patches = process_template(argv[4], argv[5], new_rom, orig_rom, symbols);
 
 	if (!verify_completeness(orig_rom, new_rom, patches)) {
@@ -460,8 +478,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	symbol_free(symbols);
-	fclose(new_rom);
-	fclose(orig_rom);
+	xfclose(new_rom);
+	xfclose(orig_rom);
 	buffer_free(patches);
 	return 0;
 }
